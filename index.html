@@ -448,15 +448,15 @@ border:1px solid #1c1c1c;border-radius:10px;
 .tier-pill{
 padding:.3rem .85rem;border-radius:20px;font-size:.72rem;font-weight:600;
 letter-spacing:.03em;cursor:pointer;border:1px solid #252525;
-color:var(–muted);background:transparent;font-family:‘DM Sans’,sans-serif;
+color:#666;background:transparent;font-family:‘DM Sans’,sans-serif;
 transition:all .2s;
 }
-.tier-pill.active.free{
-background:rgba(232,197,71,0.12);color:var(–accent);
+.tier-pill.active-free{
+background:rgba(232,197,71,0.12);color:#E8C547;
 border-color:rgba(232,197,71,0.4);
 }
-.tier-pill.active.premium{
-background:var(–accent);color:#080808;border-color:var(–accent);
+.tier-pill.active-premium{
+background:#E8C547;color:#080808;border-color:#E8C547;
 }
 
 /* Quote toggle reuse big-toggle style */
@@ -482,6 +482,20 @@ box-shadow:none;outline:none;
 text-align:center;font-size:.58rem;
 color:#333;letter-spacing:.05em;text-transform:uppercase;
 }
+
+/* Wallet coming soon toast */
+.wallet-toast{
+display:none;
+background:#111;border:1px solid rgba(232,197,71,0.3);
+border-radius:10px;padding:.75rem 1rem;margin-bottom:.8rem;
+text-align:center;
+}
+.wallet-toast.show{display:block}
+.wallet-toast-title{
+font-family:‘Syne’,sans-serif;font-weight:700;font-size:.82rem;
+color:#E8C547;letter-spacing:.02em;margin-bottom:2px;
+}
+.wallet-toast-sub{font-size:.7rem;color:#666;}
 
 /* ============================================================
 RESPONSIVE
@@ -715,10 +729,15 @@ RESPONSIVE
       <div class="mint-row-desc" id="tier-desc">Free includes informstax.com · Premium is clean</div>
     </div>
     <div class="tier-pills">
-      <button class="tier-pill free active" id="pill-free" onclick="selectTier('free')">Free</button>
-      <button class="tier-pill premium" id="pill-premium" onclick="selectTier('premium')">Premium</button>
+      <button class="tier-pill active-free" id="pill-free" onclick="selectTier('free')">Free</button>
+      <button class="tier-pill" id="pill-premium" onclick="selectTier('premium')">Premium</button>
     </div>
   </div>
+</div>
+
+<div class="wallet-toast" id="wallet-toast">
+  <div class="wallet-toast-title">⬡ Hedera Wallet Coming Soon</div>
+  <div class="wallet-toast-sub">HashPack integration in progress — check back soon</div>
 </div>
 
 <button class="mint-connect-btn" onclick="connectWalletToMint()">Connect Wallet to Mint</button>
@@ -1284,10 +1303,11 @@ function closeMintModal() {
 function selectTier(tier) {
   MINT_STATE.tier = tier;
 
-  document.getElementById('pill-free').classList.toggle('active', tier === 'free');
-  document.getElementById('pill-free').classList.toggle('free', tier === 'free');
-  document.getElementById('pill-premium').classList.toggle('active', tier === 'premium');
-  document.getElementById('pill-premium').classList.toggle('premium', tier === 'premium');
+  const pFree    = document.getElementById('pill-free');
+  const pPremium = document.getElementById('pill-premium');
+
+  pFree.className    = 'tier-pill' + (tier === 'free'    ? ' active-free'    : '');
+  pPremium.className = 'tier-pill' + (tier === 'premium' ? ' active-premium' : '');
 
   // Watermark
   const wm = document.getElementById('nft-watermark');
@@ -1374,8 +1394,9 @@ Write ONE sharp, original quote — 12 to 20 words maximum. No attribution. No q
 }
 
 function connectWalletToMint() {
-  // Wallet connection — Phase 2 Hedera integration
-  alert('Wallet connection coming soon. Hedera HTS integration in progress.');
+  const toast = document.getElementById('wallet-toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 /* ============================================================
