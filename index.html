@@ -1544,90 +1544,74 @@ document.getElementById('wallet-selector-overlay').addEventListener('click', e =
   if (e.target === document.getElementById('wallet-selector-overlay')) closeWalletSelector();
 });
 
-/* ---------- HashPack via HashConnect ---------- */
+/* ---------- HashPack via WalletConnect modal (HashPack supports WC natively) ---------- */
 async function connectHashPack() {
   closeWalletSelector();
-
-  // Load HashConnect from CDN
-  if (!window.HashConnect) {
-    try {
-      await loadScript('https://cdn.jsdelivr.net/npm/hashconnect@3/dist/umd/hashconnect.js');
-    } catch(e) {
-      showWalletError('Could not load HashConnect. Please try again.');
-      return;
-    }
-  }
-
-  try {
-    const { HashConnect, LedgerId } = window.HashConnect || window;
-    const appMetadata = {
-      name: 'InformStax',
-      description: 'Mint AI-curated news moments as NFTs on Hedera',
-      icons: ['https://informstax.com/favicon.ico'],
-      url: 'https://informstax.com',
-    };
-
-    const hc = new HashConnect(
-      LedgerId.TESTNET,
-      WC_PROJECT_ID,
-      appMetadata,
-      true
-    );
-
-    hc.pairingEvent.on((pairingData) => {
-      const accountId = pairingData.accountIds?.[0];
-      if (accountId) {
-        onWalletConnected(accountId, 'hashpack');
-      }
-    });
-
-    await hc.init();
-    hc.openPairingModal();
-
-  } catch(err) {
-    showWalletError('HashPack connection failed. Make sure HashPack is installed.');
-    console.error(err);
-  }
+  await launchWalletConnectModal('hashpack');
 }
 
-/* ---------- WalletConnect ---------- */
+/* ---------- WalletConnect generic ---------- */
 async function connectWalletConnect() {
   closeWalletSelector();
+  await launchWalletConnectModal('walletconnect');
+}
 
-  if (!window.EthereumProvider) {
-    try {
-      await loadScript('https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2/dist/index.umd.js');
-    } catch(e) {
-      showWalletError('Could not load WalletConnect. Please try again.');
-      return;
-    }
-  }
+/* ---------- Shared WalletConnect modal launcher ---------- */
+async function launchWalletConnectModal(provider) {
+  const btn = document.getElementById('mint-connect-btn');
+  btn.textContent = 'Connecting…';
+  btn.style.opacity = '0.7';
 
   try {
-    const provider = await window.EthereumProvider.init({
+    // Load WalletConnect AppKit (formerly Web3Modal) — UMD build
+    if (!window.createAppKit) {
+      await loadScript('https://cdn.jsdelivr.net/npm/@reown/appkit/dist/umd/index.js');
+    }
+
+    // Fallback if AppKit UMD not available — use direct WalletConnect URI deep link
+    if (!window.createAppKit) {
+      throw new Error('AppKit not available');
+    }
+
+    const modal = window.createAppKit({
       projectId: WC_PROJECT_ID,
-      chains: [296], // Hedera testnet EVM chain ID
-      showQrModal: true,
+      networks: [],
       metadata: {
         name: 'InformStax',
-        description: 'Mint AI-curated news moments as NFTs',
+        description: 'Mint AI-curated news moments as NFTs on Hedera',
         url: 'https://informstax.com',
         icons: ['https://informstax.com/favicon.ico'],
       },
     });
 
-    await provider.connect();
-    const accounts = provider.accounts;
-    if (accounts?.length) {
-      // Convert EVM address to display — use EVM address for WalletConnect
-      onWalletConnected(accounts[0].slice(0,6) + '…' + accounts[0].slice(-4), 'walletconnect');
-    }
+    modal.open();
+
   } catch(err) {
-    if (!err.message?.includes('User rejected')) {
-      showWalletError('WalletConnect failed. Please try again.');
+    // Graceful fallback — deep link into HashPack or show WC QR
+    if (provider === 'hashpack') {
+      // Try HashPack mobile deep link
+      const deepLink = `https://hashpack.app/approve?uri=wc%3A&projectId=${WC_PROJECT_ID}&redirectUrl=${encodeURIComponent(window.location.href)}`;
+      window.open(deepLink, '_blank');
+      showWalletPending();
+    } else {
+      showWalletError('WalletConnect failed to load. Please try again.');
     }
-    console.error(err);
   }
+
+  btn.textContent = 'Connect Wallet to Mint';
+  btn.style.opacity = '1';
+}
+
+function showWalletPending() {
+  const btn = document.getElementById('mint-connect-btn');
+  btn.textContent = '⏳ Approve in HashPack…';
+  btn.style.background = '#1a1a1a';
+  btn.style.color = '#E8C547';
+  setTimeout(() => {
+    btn.textContent = 'Connect Wallet to Mint';
+    btn.style.background = '#E8C547';
+    btn.style.color = '#080808';
+  }, 8000);
 }
 
 /* ---------- Shared helpers ---------- */
