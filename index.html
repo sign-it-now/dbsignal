@@ -883,7 +883,7 @@ RESPONSIVE
   })();
 </script>
 
-<script>
+<script type="module">
 /* ============================================================
    DEFAULT RSS FEEDS — LLM / AI topic
    ============================================================ */
@@ -1512,7 +1512,7 @@ Write ONE sharp, original quote — 12 to 20 words maximum. No attribution. No q
 }
 
 /* ============================================================
-   WALLET CONNECTION — HashPack + WalletConnect
+   WALLET CONNECTION — HashPack + WalletConnect via Reown AppKit
    ============================================================ */
 const WC_PROJECT_ID = '614e499dd10274d1b266be0c640c10c1';
 const HEDERA_NETWORK = 'testnet';
@@ -1520,12 +1520,62 @@ const HEDERA_NETWORK = 'testnet';
 let walletState = {
   connected: false,
   accountId: null,
-  provider: null, // 'hashpack' | 'walletconnect'
+  provider: null,
 };
+
+let appKit = null;
+
+async function initAppKit() {
+  if (appKit) return appKit;
+  try {
+    const { createAppKit } = await import('@reown/appkit');
+    const { WalletConnectAdapter } = await import('@reown/appkit-adapter-walletconnect');
+
+    const wcAdapter = new WalletConnectAdapter({
+      projectId: WC_PROJECT_ID,
+      metadata: {
+        name: 'InformStax',
+        description: 'Mint AI-curated news moments as NFTs on Hedera',
+        url: 'https://informstax.com',
+        icons: ['https://informstax.com/favicon.ico'],
+      },
+    });
+
+    appKit = createAppKit({
+      adapters: [wcAdapter],
+      projectId: WC_PROJECT_ID,
+      networks: [],
+      metadata: {
+        name: 'InformStax',
+        description: 'Mint AI-curated news moments as NFTs on Hedera',
+        url: 'https://informstax.com',
+        icons: ['https://informstax.com/favicon.ico'],
+      },
+      features: { analytics: false },
+    });
+
+    // Listen for connection events
+    appKit.subscribeEvents((event) => {
+      if (event.data.event === 'CONNECT_SUCCESS') {
+        const address = appKit.getAddress();
+        if (address) {
+          onWalletConnected(address.slice(0,6) + '…' + address.slice(-4), 'walletconnect');
+        }
+      }
+      if (event.data.event === 'DISCONNECT_SUCCESS') {
+        disconnectWallet();
+      }
+    });
+
+    return appKit;
+  } catch(err) {
+    console.error('AppKit init failed:', err);
+    throw err;
+  }
+}
 
 function connectWalletToMint() {
   if (walletState.connected) {
-    // Already connected — go straight to mint
     executeMint();
     return;
   }
@@ -1540,66 +1590,107 @@ function closeWalletSelector() {
   document.getElementById('wallet-selector-overlay').classList.remove('open');
 }
 
-document.getElementById('wallet-selector-overlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('wallet-selector-overlay')) closeWalletSelector();
-});
-
-/* ---------- HashPack via WalletConnect modal (HashPack supports WC natively) ---------- */
+/* ---------- HashPack ---------- */
 async function connectHashPack() {
   closeWalletSelector();
-  await launchWalletConnectModal('hashpack');
-}
-
-/* ---------- WalletConnect generic ---------- */
-async function connectWalletConnect() {
-  closeWalletSelector();
-  await launchWalletConnectModal('walletconnect');
-}
-
-/* ---------- Shared WalletConnect modal launcher ---------- */
-async function launchWalletConnectModal(provider) {
   const btn = document.getElementById('mint-connect-btn');
-  btn.textContent = 'Connecting…';
+  btn.textContent = 'Connecting to HashPack…';
   btn.style.opacity = '0.7';
 
   try {
-    // Load WalletConnect AppKit (formerly Web3Modal) — UMD build
-    if (!window.createAppKit) {
-      await loadScript('https://cdn.jsdelivr.net/npm/@reown/appkit/dist/umd/index.js');
-    }
+    const { DAppConnector, HederaJsonRpcMethod, HederaSessionEvent, HederaChainId } =
+      await import('@hashgraph/hedera-wallet-connect');
 
-    // Fallback if AppKit UMD not available — use direct WalletConnect URI deep link
-    if (!window.createAppKit) {
-      throw new Error('AppKit not available');
-    }
-
-    const modal = window.createAppKit({
-      projectId: WC_PROJECT_ID,
-      networks: [],
-      metadata: {
+    const dAppConnector = new DAppConnector(
+      {
         name: 'InformStax',
         description: 'Mint AI-curated news moments as NFTs on Hedera',
         url: 'https://informstax.com',
         icons: ['https://informstax.com/favicon.ico'],
       },
-    });
+      'testnet',
+      WC_PROJECT_ID,
+      Object.values(HederaJsonRpcMethod),
+      [HederaSessionEvent.ChainChanged, HederaSessionEvent.AccountsChanged],
+      [HederaChainId.Testnet]
+    );
 
-    modal.open();
+    await dAppConnector.init({ logger: 'error' });
+
+    dAppConnector.onSessionIframeCreated = (session) => {
+      const accountId = session.namespaces?.hedera?.accounts?.[0]?.split(':')?.[2];
+      if (accountId) onWalletConnected(accountId, 'hashpack');
+    };
+
+    await dAppConnector.openModal();
 
   } catch(err) {
-    // Graceful fallback — deep link into HashPack or show WC QR
-    if (provider === 'hashpack') {
-      // Try HashPack mobile deep link
-      const deepLink = `https://hashpack.app/approve?uri=wc%3A&projectId=${WC_PROJECT_ID}&redirectUrl=${encodeURIComponent(window.location.href)}`;
-      window.open(deepLink, '_blank');
-      showWalletPending();
-    } else {
-      showWalletError('WalletConnect failed to load. Please try again.');
-    }
+    console.error('HashPack connection error:', err);
+    showWalletError('HashPack connection failed. Try WalletConnect instead.');
   }
 
   btn.textContent = 'Connect Wallet to Mint';
   btn.style.opacity = '1';
+}
+
+/* ---------- WalletConnect ---------- */
+async function connectWalletConnect() {
+  closeWalletSelector();
+  const btn = document.getElementById('mint-connect-btn');
+  btn.textContent = 'Opening WalletConnect…';
+  btn.style.opacity = '0.7';
+
+  try {
+    const kit = await initAppKit();
+    await kit.open({ view: 'Connect' });
+  } catch(err) {
+    console.error('WalletConnect error:', err);
+    showWalletError('WalletConnect failed. Please try again.');
+  }
+
+  btn.textContent = 'Connect Wallet to Mint';
+  btn.style.opacity = '1';
+}
+
+/* ---------- Shared helpers ---------- */
+function onWalletConnected(accountId, provider) {
+  walletState.connected = true;
+  walletState.accountId = accountId;
+  walletState.provider  = provider;
+
+  document.getElementById('wallet-connected-id').textContent = accountId;
+  document.getElementById('wallet-connected-bar').classList.add('show');
+  document.getElementById('mint-connect-btn').textContent = '✦ Mint Now';
+  document.getElementById('mint-connect-btn').style.background = '#5cb85c';
+  document.getElementById('mint-connect-btn').style.color = '#fff';
+}
+
+function disconnectWallet() {
+  walletState.connected = false;
+  walletState.accountId = null;
+  walletState.provider  = null;
+
+  document.getElementById('wallet-connected-bar').classList.remove('show');
+  document.getElementById('mint-connect-btn').textContent = 'Connect Wallet to Mint';
+  document.getElementById('mint-connect-btn').style.background = '#E8C547';
+  document.getElementById('mint-connect-btn').style.color = '#080808';
+}
+
+function showWalletError(msg) {
+  const btn = document.getElementById('mint-connect-btn');
+  const orig = btn.textContent;
+  btn.textContent = '⚠ ' + msg;
+  btn.style.background = '#1a1a1a';
+  btn.style.color = '#E8C547';
+  setTimeout(() => {
+    btn.textContent = orig;
+    btn.style.background = '#E8C547';
+    btn.style.color = '#080808';
+  }, 3500);
+}
+
+function executeMint() {
+  showWalletError('Minting coming in next build!');
 }
 
 function showWalletPending() {
@@ -1653,14 +1744,6 @@ function showWalletError(msg) {
 function executeMint() {
   // Placeholder — Hedera HTS mint transaction goes here next
   showWalletError('Minting coming in next build!');
-}
-
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = src; s.onload = resolve; s.onerror = reject;
-    document.head.appendChild(s);
-  });
 }
 
 /* ============================================================
