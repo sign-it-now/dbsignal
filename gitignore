@@ -1,0 +1,28 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor folders
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment / secrets — NEVER commit API keys
+.env
+.env.local
+.env*.local
+secrets.json
+
+# Node (if you ever add a build step)
+node_modules/
+dist/
+build/
+
+# Cloudflare
+.wrangler/
