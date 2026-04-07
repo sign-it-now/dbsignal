@@ -1586,32 +1586,8 @@ async function connectHashPack() {
   btn.style.opacity = '0.7';
 
   try {
-    const { DAppConnector, HederaJsonRpcMethod, HederaSessionEvent, HederaChainId } =
-      await import('@hashgraph/hedera-wallet-connect');
-
-    const dAppConnector = new DAppConnector(
-      {
-        name: 'InformStax',
-        description: 'Mint AI-curated news moments as NFTs on Hedera',
-        url: 'https://informstax.com',
-        icons: ['https://informstax.com/favicon.ico'],
-      },
-      'testnet',
-      WC_PROJECT_ID,
-      Object.values(HederaJsonRpcMethod),
-      [HederaSessionEvent.ChainChanged, HederaSessionEvent.AccountsChanged],
-      [HederaChainId.Testnet]
-    );
-
-    await dAppConnector.init({ logger: 'error' });
-
-    dAppConnector.onSessionIframeCreated = (session) => {
-      const accountId = session.namespaces?.hedera?.accounts?.[0]?.split(':')?.[2];
-      if (accountId) onWalletConnected(accountId, 'hashpack');
-    };
-
-    await dAppConnector.openModal();
-
+    const kit = await initAppKit();
+    await kit.open({ view: 'Connect' });
   } catch(err) {
     console.error('HashPack connection error:', err);
     showWalletError('HashPack connection failed. Try WalletConnect instead.');
