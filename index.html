@@ -497,6 +497,87 @@ color:#E8C547;letter-spacing:.02em;margin-bottom:2px;
 }
 .wallet-toast-sub{font-size:.7rem;color:#666;}
 
+/* Wallet Selector Sheet */
+.wallet-selector-overlay{
+display:none;position:fixed;inset:0;
+background:rgba(0,0,0,.6);z-index:400;
+align-items:flex-end;justify-content:center;
+backdrop-filter:blur(4px);
+}
+.wallet-selector-overlay.open{display:flex}
+.wallet-selector-sheet{
+background:#0d0d0d;border:1px solid #1c1c1c;
+border-radius:20px 20px 0 0;width:100%;max-width:480px;
+padding:1.4rem 1.4rem 2.4rem;
+animation:slideUp .25s cubic-bezier(.32,.72,0,1);
+}
+.wallet-selector-handle{
+width:36px;height:4px;border-radius:2px;
+background:#333;margin:0 auto 1.2rem;
+}
+.wallet-selector-title{
+font-family:‘Syne’,sans-serif;font-weight:800;font-size:.95rem;
+color:#f0ede6;text-align:center;margin-bottom:1.2rem;
+letter-spacing:.01em;
+}
+.wallet-option{
+display:flex;align-items:center;gap:1rem;
+padding:1rem 1.1rem;border-radius:12px;
+border:1px solid #1c1c1c;background:#080808;
+cursor:pointer;transition:all .2s;margin-bottom:.7rem;
+width:100%;text-align:left;
+}
+.wallet-option:hover{border-color:#E8C547;background:#0f0f0a}
+.wallet-option:active{opacity:.8}
+.wallet-option-icon{
+width:44px;height:44px;border-radius:10px;
+display:flex;align-items:center;justify-content:center;
+font-size:1.4rem;flex-shrink:0;
+}
+.icon-hashpack{background:linear-gradient(135deg,#7b5ea7,#5b3f8a)}
+.icon-walletconnect{background:linear-gradient(135deg,#3b99fc,#1a6fd4)}
+.wallet-option-info{flex:1}
+.wallet-option-name{
+font-family:‘Syne’,sans-serif;font-weight:700;font-size:.88rem;
+color:#f0ede6;margin-bottom:2px;
+}
+.wallet-option-desc{font-size:.68rem;color:#666;}
+.wallet-option-badge{
+font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;
+padding:3px 8px;border-radius:20px;font-weight:700;flex-shrink:0;
+background:rgba(232,197,71,0.12);color:#E8C547;
+border:1px solid rgba(232,197,71,0.3);
+}
+.wallet-selector-cancel{
+width:100%;padding:.75rem;border-radius:10px;
+background:transparent;border:1px solid #1c1c1c;
+color:#666;font-family:‘DM Sans’,sans-serif;font-size:.82rem;
+cursor:pointer;margin-top:.3rem;transition:all .2s;
+}
+.wallet-selector-cancel:hover{border-color:#333;color:#888}
+
+/* Connected state */
+.wallet-connected-bar{
+display:none;
+align-items:center;justify-content:space-between;
+padding:.7rem 1rem;background:#080808;
+border:1px solid rgba(232,197,71,0.3);border-radius:10px;
+margin-bottom:.8rem;
+}
+.wallet-connected-bar.show{display:flex}
+.wallet-connected-info{display:flex;align-items:center;gap:8px}
+.wallet-connected-dot{
+width:8px;height:8px;border-radius:50%;background:#5cb85c;
+animation:blink 2s ease-in-out infinite;
+}
+.wallet-connected-id{font-size:.75rem;color:#E8C547;font-weight:600;font-family:‘Syne’,sans-serif}
+.wallet-disconnect-btn{
+font-size:.65rem;color:#666;background:none;border:none;
+cursor:pointer;padding:4px 8px;border-radius:4px;
+font-family:‘DM Sans’,sans-serif;transition:color .2s;
+}
+.wallet-disconnect-btn:hover{color:#d9534f}
+
 /* ============================================================
 RESPONSIVE
 ============================================================ */
@@ -735,13 +816,50 @@ RESPONSIVE
   </div>
 </div>
 
-<div class="wallet-toast" id="wallet-toast">
-  <div class="wallet-toast-title">⬡ Hedera Wallet Coming Soon</div>
-  <div class="wallet-toast-sub">HashPack integration in progress — check back soon</div>
+<!-- Connected wallet bar (hidden until connected) -->
+<div class="wallet-connected-bar" id="wallet-connected-bar">
+  <div class="wallet-connected-info">
+    <div class="wallet-connected-dot"></div>
+    <div class="wallet-connected-id" id="wallet-connected-id">0.0.xxxxxxx</div>
+  </div>
+  <button class="wallet-disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
 </div>
 
-<button class="mint-connect-btn" onclick="connectWalletToMint()">Connect Wallet to Mint</button>
+<button class="mint-connect-btn" id="mint-connect-btn" onclick="connectWalletToMint()">Connect Wallet to Mint</button>
 <div class="mint-copyright">© dbappsystems.com · InformStax NFT</div>
+```
+
+  </div>
+</div>
+
+<!-- ============================================================
+     WALLET SELECTOR SHEET
+     ============================================================ -->
+
+<div class="wallet-selector-overlay" id="wallet-selector-overlay">
+  <div class="wallet-selector-sheet">
+    <div class="wallet-selector-handle"></div>
+    <div class="wallet-selector-title">Choose Your Wallet</div>
+
+```
+<button class="wallet-option" onclick="connectHashPack()">
+  <div class="wallet-option-icon icon-hashpack">ℍ</div>
+  <div class="wallet-option-info">
+    <div class="wallet-option-name">HashPack</div>
+    <div class="wallet-option-desc">Hedera native · Opens HashPack directly</div>
+  </div>
+  <div class="wallet-option-badge">Recommended</div>
+</button>
+
+<button class="wallet-option" onclick="connectWalletConnect()">
+  <div class="wallet-option-icon icon-walletconnect">⬡</div>
+  <div class="wallet-option-info">
+    <div class="wallet-option-name">WalletConnect</div>
+    <div class="wallet-option-desc">All other wallets · QR or deep link</div>
+  </div>
+</button>
+
+<button class="wallet-selector-cancel" onclick="closeWalletSelector()">Cancel</button>
 ```
 
   </div>
@@ -1393,10 +1511,172 @@ Write ONE sharp, original quote — 12 to 20 words maximum. No attribution. No q
   }
 }
 
+/* ============================================================
+   WALLET CONNECTION — HashPack + WalletConnect
+   ============================================================ */
+const WC_PROJECT_ID = '614e499dd10274d1b266be0c640c10c1';
+const HEDERA_NETWORK = 'testnet';
+
+let walletState = {
+  connected: false,
+  accountId: null,
+  provider: null, // 'hashpack' | 'walletconnect'
+};
+
 function connectWalletToMint() {
-  const toast = document.getElementById('wallet-toast');
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
+  if (walletState.connected) {
+    // Already connected — go straight to mint
+    executeMint();
+    return;
+  }
+  openWalletSelector();
+}
+
+function openWalletSelector() {
+  document.getElementById('wallet-selector-overlay').classList.add('open');
+}
+
+function closeWalletSelector() {
+  document.getElementById('wallet-selector-overlay').classList.remove('open');
+}
+
+document.getElementById('wallet-selector-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('wallet-selector-overlay')) closeWalletSelector();
+});
+
+/* ---------- HashPack via HashConnect ---------- */
+async function connectHashPack() {
+  closeWalletSelector();
+
+  // Load HashConnect from CDN
+  if (!window.HashConnect) {
+    try {
+      await loadScript('https://cdn.jsdelivr.net/npm/hashconnect@3/dist/umd/hashconnect.js');
+    } catch(e) {
+      showWalletError('Could not load HashConnect. Please try again.');
+      return;
+    }
+  }
+
+  try {
+    const { HashConnect, LedgerId } = window.HashConnect || window;
+    const appMetadata = {
+      name: 'InformStax',
+      description: 'Mint AI-curated news moments as NFTs on Hedera',
+      icons: ['https://informstax.com/favicon.ico'],
+      url: 'https://informstax.com',
+    };
+
+    const hc = new HashConnect(
+      LedgerId.TESTNET,
+      WC_PROJECT_ID,
+      appMetadata,
+      true
+    );
+
+    hc.pairingEvent.on((pairingData) => {
+      const accountId = pairingData.accountIds?.[0];
+      if (accountId) {
+        onWalletConnected(accountId, 'hashpack');
+      }
+    });
+
+    await hc.init();
+    hc.openPairingModal();
+
+  } catch(err) {
+    showWalletError('HashPack connection failed. Make sure HashPack is installed.');
+    console.error(err);
+  }
+}
+
+/* ---------- WalletConnect ---------- */
+async function connectWalletConnect() {
+  closeWalletSelector();
+
+  if (!window.EthereumProvider) {
+    try {
+      await loadScript('https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2/dist/index.umd.js');
+    } catch(e) {
+      showWalletError('Could not load WalletConnect. Please try again.');
+      return;
+    }
+  }
+
+  try {
+    const provider = await window.EthereumProvider.init({
+      projectId: WC_PROJECT_ID,
+      chains: [296], // Hedera testnet EVM chain ID
+      showQrModal: true,
+      metadata: {
+        name: 'InformStax',
+        description: 'Mint AI-curated news moments as NFTs',
+        url: 'https://informstax.com',
+        icons: ['https://informstax.com/favicon.ico'],
+      },
+    });
+
+    await provider.connect();
+    const accounts = provider.accounts;
+    if (accounts?.length) {
+      // Convert EVM address to display — use EVM address for WalletConnect
+      onWalletConnected(accounts[0].slice(0,6) + '…' + accounts[0].slice(-4), 'walletconnect');
+    }
+  } catch(err) {
+    if (!err.message?.includes('User rejected')) {
+      showWalletError('WalletConnect failed. Please try again.');
+    }
+    console.error(err);
+  }
+}
+
+/* ---------- Shared helpers ---------- */
+function onWalletConnected(accountId, provider) {
+  walletState.connected = true;
+  walletState.accountId = accountId;
+  walletState.provider  = provider;
+
+  // Update UI
+  document.getElementById('wallet-connected-id').textContent = accountId;
+  document.getElementById('wallet-connected-bar').classList.add('show');
+  document.getElementById('mint-connect-btn').textContent = '✦ Mint Now';
+  document.getElementById('mint-connect-btn').style.background = '#5cb85c';
+}
+
+function disconnectWallet() {
+  walletState.connected = false;
+  walletState.accountId = null;
+  walletState.provider  = null;
+
+  document.getElementById('wallet-connected-bar').classList.remove('show');
+  document.getElementById('mint-connect-btn').textContent = 'Connect Wallet to Mint';
+  document.getElementById('mint-connect-btn').style.background = '#E8C547';
+}
+
+function showWalletError(msg) {
+  const btn = document.getElementById('mint-connect-btn');
+  const orig = btn.textContent;
+  btn.textContent = '⚠ ' + msg;
+  btn.style.background = '#333';
+  btn.style.color = '#E8C547';
+  setTimeout(() => {
+    btn.textContent = orig;
+    btn.style.background = '#E8C547';
+    btn.style.color = '#080808';
+  }, 3500);
+}
+
+function executeMint() {
+  // Placeholder — Hedera HTS mint transaction goes here next
+  showWalletError('Minting coming in next build!');
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
 }
 
 /* ============================================================
@@ -1412,6 +1692,11 @@ function init() {
   // Wire mint modal backdrop tap to close
   document.getElementById('mint-overlay').addEventListener('click', e => {
     if (e.target === document.getElementById('mint-overlay')) closeMintModal();
+  });
+
+  // Wire wallet selector backdrop tap to close
+  document.getElementById('wallet-selector-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('wallet-selector-overlay')) closeWalletSelector();
   });
 }
 init();
