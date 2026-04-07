@@ -1689,6 +1689,26 @@ function init() {
     if (e.target === document.getElementById('wallet-selector-overlay')) closeWalletSelector();
   });
 }
+
+// Expose all functions to global scope (required for onclick handlers in module scripts)
+window.toggleTheme       = toggleTheme;
+window.toggleMode        = toggleMode;
+window.switchTab         = switchTab;
+window.saveAndApply      = saveAndApply;
+window.addFeed           = addFeed;
+window.removeFeed        = removeFeed;
+window.resetFeeds        = resetFeeds;
+window.closeAdmin        = closeAdmin;
+window.openMintModal     = openMintModal;
+window.closeMintModal    = closeMintModal;
+window.toggleMintQuote   = toggleMintQuote;
+window.selectTier        = selectTier;
+window.connectWalletToMint   = connectWalletToMint;
+window.closeWalletSelector   = closeWalletSelector;
+window.connectHashPack       = connectHashPack;
+window.connectWalletConnect  = connectWalletConnect;
+window.disconnectWallet      = disconnectWallet;
+
 init();
 </script>
 
