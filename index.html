@@ -468,10 +468,12 @@ font-size:.68rem;color:var(–accent);
 /* Connect Button */
 .mint-connect-btn{
 width:100%;padding:.9rem;border-radius:12px;
-background:var(–accent);color:#080808;
+background:#E8C547 !important;color:#080808 !important;
 border:none;font-family:‘Syne’,sans-serif;font-weight:800;
 font-size:.95rem;letter-spacing:.02em;cursor:pointer;
 transition:opacity .2s;margin-bottom:.6rem;
+-webkit-appearance:none !important;appearance:none;
+box-shadow:none;outline:none;
 }
 .mint-connect-btn:hover{opacity:.88}
 .mint-connect-btn:active{opacity:.75}
@@ -675,7 +677,7 @@ RESPONSIVE
 
 ```
 <div class="mint-header">
-  <div class="mint-title">⬡ Mint This Moment</div>
+  <div class="mint-title">✦ Mint This Moment</div>
   <button class="mint-close" onclick="closeMintModal()">✕</button>
 </div>
 
@@ -1147,7 +1149,7 @@ function cardHTML(a, i) {
       <div class="card-footer">
         <div class="card-date">${escHTML(a.date)}</div>
         <button class="mint-btn" onclick="openMintModal(${i})">
-          <span class="hex">⬡</span> Mint
+          <span class="hex">✦</span> Mint
         </button>
       </div>
     </div>`;
