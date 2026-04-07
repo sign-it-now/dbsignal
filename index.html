@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DBSignal — LLM Intelligence</title>
+<title>InformStax — LLM Intelligence</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
@@ -318,9 +318,9 @@ RESPONSIVE
 
 <nav class="nav">
   <div class="logo" id="logo-trigger" title="Click 5× for creator settings">
-    DB<span>SIGNAL</span><sub id="nav-sub">LLM</sub>
+    INFORM<span>STAX</span><sub id="nav-sub">LLM</sub>
   </div>
-  <div class="nav-center" id="topic-label">LLM Intelligence — Live Feed</div>
+  <div class="nav-center" id="topic-label">InformStax — LLM Intelligence</div>
   <div class="nav-right">
     <div class="mode-pill" id="mode-pill">
       <div class="dot"></div>
@@ -338,12 +338,12 @@ RESPONSIVE
 <div class="ticker-wrap">
   <div class="ticker-inner" id="ticker-inner">
     <span class="live">LIVE</span>
-    <span>LLM Intelligence — curated by DBSignal</span>
+    <span>InformStax — LLM Intelligence</span>
     <span>·</span><span>Real-time RSS from the world's top AI sources</span>
     <span>·</span><span>Beards Doctrine Compliant — sources always credited</span>
     <span>·</span>
     <span class="live">LIVE</span>
-    <span>LLM Intelligence — curated by DBSignal</span>
+    <span>InformStax — LLM Intelligence</span>
     <span>·</span><span>Real-time RSS from the world's top AI sources</span>
     <span>·</span><span>Beards Doctrine Compliant — sources always credited</span>
     <span>·</span>
@@ -382,7 +382,7 @@ RESPONSIVE
 <div class="admin-overlay" id="admin-overlay">
   <div class="admin-panel">
     <div class="admin-header">
-      <div class="admin-title">⚙ Creator Settings</div>
+      <div class="admin-title">⚙ InformStax Creator Settings</div>
       <button class="admin-close" onclick="closeAdmin()">✕</button>
     </div>
     <div class="admin-body">
@@ -450,7 +450,7 @@ RESPONSIVE
   <div class="tab-panel" id="tab-label">
     <div>
       <div class="admin-section-label">Blog Title</div>
-      <input class="admin-input" type="text" id="wl-title" placeholder="e.g. LLM Intelligence" />
+      <input class="admin-input" type="text" id="wl-title" placeholder="e.g. InformStax" />
     </div>
     <div>
       <div class="admin-section-label">Sub-label (shows in nav)</div>
@@ -514,7 +514,7 @@ const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
 let STATE = {
   mode:       'beards',
   apiKey:     '',
-  wlTitle:    'LLM Intelligence',
+  wlTitle:    'InformStax',
   wlSub:      'LLM',
   wlTag:      'LLM · AI · Machine Learning',
   feeds:      JSON.parse(JSON.stringify(DEFAULT_FEEDS)),
@@ -531,8 +531,8 @@ function loadState() {
     const s = JSON.parse(localStorage.getItem('dbsignal_v2') || '{}');
     if (s.mode)    STATE.mode    = s.mode;
     if (s.apiKey)  STATE.apiKey  = s.apiKey;
-    if (s.wlTitle) STATE.wlTitle = s.wlTitle;
-    if (s.wlSub)   STATE.wlSub   = s.wlSub;
+    if (s.wlTitle) STATE.wlTitle = s.wlTitle; else STATE.wlTitle = 'InformStax';
+    if (s.wlSub)   STATE.wlSub   = s.wlSub;   else STATE.wlSub   = 'LLM';
     if (s.wlTag)   STATE.wlTag   = s.wlTag;
     if (s.feeds && s.feeds.length) STATE.feeds = s.feeds;
   } catch(e) {}
@@ -685,7 +685,7 @@ function resetFeeds() {
    ============================================================ */
 function saveAndApply() {
   const key    = document.getElementById('api-key-input').value.trim();
-  const wlT    = document.getElementById('wl-title').value.trim() || 'LLM Intelligence';
+  const wlT    = document.getElementById('wl-title').value.trim() || 'InformStax';
   const wlS    = document.getElementById('wl-sub').value.trim()   || 'LLM';
   const wlTag  = document.getElementById('wl-tag').value.trim()   || 'LLM · AI · Machine Learning';
 
@@ -712,9 +712,9 @@ function saveAndApply() {
 }
 
 function applyWhiteLabel() {
-  document.getElementById('topic-label').textContent = STATE.wlTitle + ' — Live Feed';
+  document.getElementById('topic-label').textContent = STATE.wlTitle + ' — LLM Intelligence';
   document.getElementById('nav-sub').textContent     = STATE.wlSub;
-  document.title = 'DBSignal — ' + STATE.wlTitle;
+  document.title = STATE.wlTitle + ' — LLM Intelligence';
 }
 
 /* ============================================================
