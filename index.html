@@ -8,8 +8,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
-   THEME TOKENS
+   THEME TOKENS — dark is default, light overrides
    ============================================================ */
+:root {
+  --bg:#080808; --bg2:#0d0d0d; --bg3:#111;
+  --border:#1c1c1c; --border2:#252525;
+  --text:#f0ede6; --muted:#888; --faint:#4a4a4a;
+  --accent:#E8C547; --accent2:#c8a030; --accent-text:#080808;
+  --ticker-bg:#0a0a0a; --card-bg:#0d0d0d;
+  --admin-bg:#08080f; --mode2-glow:rgba(232,197,71,0.06);
+}
 :root[data-theme="dark"] {
   --bg:#080808; --bg2:#0d0d0d; --bg3:#111;
   --border:#1c1c1c; --border2:#252525;
@@ -506,7 +514,8 @@ const DEFAULT_FEEDS = [
   {url:'https://simonwillison.net/atom/everything/',                         source:'Simon Willison',cat:'technical'},
 ];
 
-const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
+const RSS2JSON   = 'https://api.rss2json.com/v1/api.json?rss_url=';
+const ALLORIGINS = 'https://api.allorigins.win/get?url=';
 
 /* ============================================================
    STATE
@@ -734,23 +743,57 @@ document.getElementById('categories').addEventListener('click', e => {
    RSS FETCHING
    ============================================================ */
 async function fetchFeed(feed) {
-  const url = RSS2JSON + encodeURIComponent(feed.url) + '&count=3';
+  // Try allorigins first — direct XML parse
   try {
-    const res  = await fetch(url);
+    const res  = await fetch(ALLORIGINS + encodeURIComponent(feed.url));
     const data = await res.json();
-    if (data.status !== 'ok') return [];
-    return data.items.map(item => ({
-      title:     item.title || '',
-      link:      item.link  || item.guid || '#',
-      summary:   stripHTML(item.description || item.content || '').slice(0, 420),
-      date:      item.pubDate
-        ? new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
-        : '',
-      source:    feed.source,
-      cat:       feed.cat,
-      rewritten: null,
-      rewriting: false,
-    }));
+    if (data && data.contents) {
+      const items = parseRSSXML(data.contents, feed);
+      if (items.length) return items;
+    }
+  } catch {}
+  // Fallback to rss2json
+  try {
+    const res  = await fetch(RSS2JSON + encodeURIComponent(feed.url) + '&count=3');
+    const data = await res.json();
+    if (data.status === 'ok') {
+      return data.items.map(item => ({
+        title:     item.title || '',
+        link:      item.link  || item.guid || '#',
+        summary:   stripHTML(item.description || item.content || '').slice(0, 420),
+        date:      item.pubDate
+          ? new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
+          : '',
+        source:    feed.source,
+        cat:       feed.cat,
+        rewritten: null,
+        rewriting: false,
+      }));
+    }
+  } catch {}
+  return [];
+}
+
+function parseRSSXML(xmlStr, feed) {
+  try {
+    const doc   = new DOMParser().parseFromString(xmlStr, 'text/xml');
+    const items = Array.from(doc.querySelectorAll('item, entry')).slice(0, 3);
+    return items.map(item => {
+      const get   = tag => item.querySelector(tag)?.textContent?.trim() || '';
+      const link  = get('link') || item.querySelector('link')?.getAttribute('href') || '#';
+      const desc  = get('description') || get('summary') || get('content') || '';
+      const pub   = get('pubDate') || get('published') || get('updated') || '';
+      return {
+        title:     get('title'),
+        link,
+        summary:   stripHTML(desc).slice(0, 420),
+        date:      pub ? new Date(pub).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '',
+        source:    feed.source,
+        cat:       feed.cat,
+        rewritten: null,
+        rewriting: false,
+      };
+    }).filter(a => a.title);
   } catch { return []; }
 }
 
