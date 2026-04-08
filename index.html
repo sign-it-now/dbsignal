@@ -642,7 +642,60 @@ function decodeEntities(str){const txt=document.createElement('textarea');txt.in
 function stripHTML(html){return html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();}
 function escHTML(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-async function loadAllFeeds(){renderSkeletons();const results=await Promise.allSettled(STATE.feeds.map(fetchFeed));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);STATE.articles=articles;renderCards(articles);}
+const CACHE_KEY='dbsignal_articles_v1';
+const CACHE_TTL=30*60*1000;// 30 minutes
+
+function getCachedArticles(){
+  try{
+    const raw=localStorage.getItem(CACHE_KEY);
+    if(!raw)return null;
+    const{ts,articles}=JSON.parse(raw);
+    if(Date.now()-ts>CACHE_TTL)return null;
+    return articles;
+  }catch{return null;}
+}
+
+function setCachedArticles(articles){
+  try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),articles}));}catch{}
+}
+
+function dedupeAndShuffle(articles){
+  const seen=new Set();
+  return articles.filter(a=>{
+    const k=a.title.toLowerCase().slice(0,60);
+    if(seen.has(k))return false;
+    seen.add(k);return true;
+  }).sort(()=>Math.random()-.5);
+}
+
+async function loadAllFeeds(){
+  // Show cached instantly if available
+  const cached=getCachedArticles();
+  if(cached&&cached.length){
+    STATE.articles=cached;
+    renderCards(cached);
+    // Refresh in background silently
+    refreshFeedsInBackground();
+    return;
+  }
+  // No cache — show skeletons and fetch
+  renderSkeletons();
+  await fetchAndRender();
+}
+
+async function fetchAndRender(){
+  const results=await Promise.allSettled(STATE.feeds.map(fetchFeed));
+  let articles=[];
+  results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});
+  articles=dedupeAndShuffle(articles);
+  setCachedArticles(articles);
+  STATE.articles=articles;
+  renderCards(articles);
+}
+
+async function refreshFeedsInBackground(){
+  try{await fetchAndRender();}catch{}
+}
 function renderSkeletons(){document.getElementById('feed').innerHTML=Array.from({length:6}).map(()=>`<div class="card"><div class="card-header"><div class="skeleton short"></div><div class="skeleton" style="width:50px"></div></div><div class="card-body"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton short"></div><div class="skeleton tall" style="margin-top:10px"></div></div><div class="card-footer"><div class="skeleton" style="width:60px"></div><div class="skeleton" style="width:80px"></div></div></div>`).join('');}
 function renderCards(articles){const feed=document.getElementById('feed');const list=STATE.currentCat==='all'?articles:articles.filter(a=>a.cat===STATE.currentCat);if(!list.length){feed.innerHTML=`<div class="state-box"><div class="icon">📡</div><div>No articles for this category.<br><small style="color:var(--faint)">Add feeds via Creator Settings (click logo 5×)</small></div></div>`;return;}feed.innerHTML=list.map((a,i)=>cardHTML(a,i)).join('');if(STATE.mode==='edge'&&getActiveKey())list.forEach((a,i)=>{if(!a.rewritten&&!a.rewriting)rewriteArticle(a,i,list);});}
 
