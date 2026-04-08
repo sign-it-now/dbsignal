@@ -114,6 +114,9 @@ a{text-decoration:none}
 .admin-btn.sm{padding:.4rem .9rem;font-size:.75rem;width:auto}
 .admin-status{font-size:.72rem;text-align:center;color:var(--muted);min-height:18px}
 .admin-status.ok{color:#5cb85c}.admin-status.err{color:#d9534f}
+/* site key notice box */
+.site-key-notice{background:var(--bg);border:1px solid rgba(232,197,71,0.3);border-radius:8px;padding:.75rem 1rem;font-size:.7rem;color:var(--faint);line-height:1.6}
+.site-key-notice strong{color:var(--accent)}
 .state-box{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;padding:5rem 2rem;color:var(--muted);font-size:.85rem;text-align:center}
 .state-box .icon{font-size:2rem;opacity:.4}
 /* MINT */
@@ -168,7 +171,6 @@ a{text-decoration:none}
 .wallet-install-notice-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:#f6851b;margin-bottom:3px}
 .wallet-install-notice-sub{font-size:.7rem;color:#888}
 .wallet-install-link{font-size:.72rem;color:#E8C547;font-weight:600;text-decoration:underline;cursor:pointer;margin-left:4px}
-/* WALLET SELECTOR */
 .wallet-selector-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
 .wallet-selector-overlay.open{display:flex}
 .wallet-selector-sheet{background:#0d0d0d;border:1px solid #1c1c1c;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:1.4rem 1.4rem 2.4rem;animation:slideUp .25s cubic-bezier(.32,.72,0,1)}
@@ -253,63 +255,91 @@ a{text-decoration:none}
         <button class="admin-tab" onclick="switchTab('label',this)">White Label</button>
         <button class="admin-tab" onclick="switchTab('api',this)">API Key</button>
       </div>
-      <div class="tab-panel active" id="tab-mode">
-        <div class="mode-toggle-row">
-          <div class="mode-toggle-info">
-            <div class="mode-toggle-name" id="mode-name">Beards Doctrine (Default)</div>
-            <div class="mode-toggle-desc" id="mode-desc">AI summary + source link. Fully compliant.</div>
-          </div>
-          <div class="big-toggle" id="mode-big-toggle" onclick="toggleMode()"><div class="big-toggle-knob"></div></div>
-        </div>
-        <p style="font-size:.72rem;color:var(--faint);line-height:1.6"><strong style="color:var(--muted)">Beards Doctrine</strong> — AI summary + source link.<br><br><strong style="color:var(--muted)">Stax Edge</strong> — Claude rewrites in sharp CEO voice. Requires API key.</p>
-        <button class="admin-btn" onclick="saveAndApply()">Save &amp; Apply</button>
-        <div class="admin-status" id="status-mode"></div>
+
+```
+  <!-- MODE TAB -->
+  <div class="tab-panel active" id="tab-mode">
+    <div class="mode-toggle-row">
+      <div class="mode-toggle-info">
+        <div class="mode-toggle-name" id="mode-name">Beards Doctrine (Default)</div>
+        <div class="mode-toggle-desc" id="mode-desc">AI summary + source link. Fully compliant.</div>
       </div>
-      <div class="tab-panel" id="tab-feeds">
-        <div>
-          <div class="admin-section-label">Active Feeds (<span id="feed-count">0</span>)</div>
-          <div class="feed-list" id="feed-list"></div>
-        </div>
-        <div class="master-dropdown-wrap">
-          <div class="master-dropdown-label">✦ Browse Master Feed List (100+ Sources)</div>
-          <select class="master-select" id="master-feed-select" onchange="fillFromMaster()"><option value="">— Choose a feed to auto-fill below —</option></select>
-          <div class="master-hint">Selecting auto-fills URL, name &amp; category below</div>
-        </div>
-        <div class="or-divider">or paste a custom URL</div>
-        <div>
-          <div class="admin-section-label">Add New Feed</div>
-          <div class="feed-add-form">
-            <div class="full"><input class="admin-input" type="url" id="new-feed-url" placeholder="https://example.com/feed.xml" /></div>
-            <input class="admin-input" type="text" id="new-feed-source" placeholder="Source name" />
-            <select class="admin-select" id="new-feed-cat">
-              <option value="ai-llm">🤖 AI / LLM</option><option value="tech">💻 Tech</option>
-              <option value="cloud">☁️ Cloud</option><option value="blockchain">⛓️ Blockchain</option>
-              <option value="science">🔬 Science</option><option value="biology">🧬 Biology</option>
-              <option value="math">➗ Math</option><option value="health">💊 Health</option>
-              <option value="engineering">⚙️ Engineering</option><option value="business">👔 Business</option>
-              <option value="space">🛸 Space</option>
-            </select>
-            <div class="full"><button class="admin-btn sm" onclick="addFeed()">+ Add Feed</button></div>
-          </div>
-        </div>
-        <button class="admin-btn secondary" onclick="resetFeeds()">Reset to Default Feeds</button>
-        <button class="admin-btn" onclick="saveAndApply()">Save &amp; Reload Feed</button>
-        <div class="admin-status" id="status-feeds"></div>
-      </div>
-      <div class="tab-panel" id="tab-label">
-        <div><div class="admin-section-label">Blog Title</div><input class="admin-input" type="text" id="wl-title" placeholder="e.g. InformStax" /></div>
-        <div><div class="admin-section-label">Sub-label (nav)</div><input class="admin-input" type="text" id="wl-sub" placeholder="e.g. LLM" /></div>
-        <div><div class="admin-section-label">Topic Tag Line</div><input class="admin-input" type="text" id="wl-tag" placeholder="e.g. LLM · AI · Machine Learning" /></div>
-        <button class="admin-btn" onclick="saveAndApply()">Save &amp; Apply</button>
-        <div class="admin-status" id="status-label"></div>
-      </div>
-      <div class="tab-panel" id="tab-api">
-        <div><div class="admin-section-label">Claude API Key (for Stax Edge)</div><input class="admin-input" type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off" /></div>
-        <p style="font-size:.7rem;color:var(--faint);line-height:1.6">Stored locally only. Never sent anywhere except Anthropic during rewrites. Get yours at <strong style="color:var(--muted)">console.anthropic.com</strong></p>
-        <button class="admin-btn" onclick="saveAndApply()">Save Key</button>
-        <div class="admin-status" id="status-api"></div>
+      <div class="big-toggle" id="mode-big-toggle" onclick="toggleMode()"><div class="big-toggle-knob"></div></div>
+    </div>
+    <p style="font-size:.72rem;color:var(--faint);line-height:1.6"><strong style="color:var(--muted)">Beards Doctrine</strong> — AI summary + source link.<br><br><strong style="color:var(--muted)">Stax Edge</strong> — Claude rewrites in sharp CEO voice. Uses Site Default Key if set, otherwise your personal key.</p>
+    <button class="admin-btn" onclick="saveAndApply()">Save &amp; Apply</button>
+    <div class="admin-status" id="status-mode"></div>
+  </div>
+
+  <!-- FEEDS TAB -->
+  <div class="tab-panel" id="tab-feeds">
+    <div>
+      <div class="admin-section-label">Active Feeds (<span id="feed-count">0</span>)</div>
+      <div class="feed-list" id="feed-list"></div>
+    </div>
+    <div class="master-dropdown-wrap">
+      <div class="master-dropdown-label">✦ Browse Master Feed List (100+ Sources)</div>
+      <select class="master-select" id="master-feed-select" onchange="fillFromMaster()"><option value="">— Choose a feed to auto-fill below —</option></select>
+      <div class="master-hint">Selecting auto-fills URL, name &amp; category below</div>
+    </div>
+    <div class="or-divider">or paste a custom URL</div>
+    <div>
+      <div class="admin-section-label">Add New Feed</div>
+      <div class="feed-add-form">
+        <div class="full"><input class="admin-input" type="url" id="new-feed-url" placeholder="https://example.com/feed.xml" /></div>
+        <input class="admin-input" type="text" id="new-feed-source" placeholder="Source name" />
+        <select class="admin-select" id="new-feed-cat">
+          <option value="ai-llm">🤖 AI / LLM</option><option value="tech">💻 Tech</option>
+          <option value="cloud">☁️ Cloud</option><option value="blockchain">⛓️ Blockchain</option>
+          <option value="science">🔬 Science</option><option value="biology">🧬 Biology</option>
+          <option value="math">➗ Math</option><option value="health">💊 Health</option>
+          <option value="engineering">⚙️ Engineering</option><option value="business">👔 Business</option>
+          <option value="space">🛸 Space</option>
+        </select>
+        <div class="full"><button class="admin-btn sm" onclick="addFeed()">+ Add Feed</button></div>
       </div>
     </div>
+    <button class="admin-btn secondary" onclick="resetFeeds()">Reset to Default Feeds</button>
+    <button class="admin-btn" onclick="saveAndApply()">Save &amp; Reload Feed</button>
+    <div class="admin-status" id="status-feeds"></div>
+  </div>
+
+  <!-- WHITE LABEL TAB -->
+  <div class="tab-panel" id="tab-label">
+    <div><div class="admin-section-label">Blog Title</div><input class="admin-input" type="text" id="wl-title" placeholder="e.g. InformStax" /></div>
+    <div><div class="admin-section-label">Sub-label (nav)</div><input class="admin-input" type="text" id="wl-sub" placeholder="e.g. LLM" /></div>
+    <div><div class="admin-section-label">Topic Tag Line</div><input class="admin-input" type="text" id="wl-tag" placeholder="e.g. LLM · AI · Machine Learning" /></div>
+    <button class="admin-btn" onclick="saveAndApply()">Save &amp; Apply</button>
+    <div class="admin-status" id="status-label"></div>
+  </div>
+
+  <!-- API KEY TAB -->
+  <div class="tab-panel" id="tab-api">
+
+    <!-- SITE DEFAULT KEY — powers Stax Edge for ALL visitors -->
+    <div>
+      <div class="admin-section-label">🌐 Site Default Key — Powers Stax Edge for All Visitors</div>
+      <input class="admin-input" type="password" id="site-key-input" placeholder="sk-ant-... (all visitors use this)" autocomplete="off" />
+    </div>
+    <div class="site-key-notice">
+      <strong>Your key, their experience.</strong> When set, every visitor gets Stax Edge rewrites powered by this key — on your Anthropic bill. Leave blank to require visitors to enter their own key. Note: this key is visible in browser source — a Cloudflare Worker proxy is the secure alternative (coming next build).
+    </div>
+
+    <div class="or-divider">personal override key</div>
+
+    <!-- PERSONAL KEY — overrides site key for this browser only -->
+    <div>
+      <div class="admin-section-label">🔑 Personal Key — Your Browser Only</div>
+      <input class="admin-input" type="password" id="api-key-input" placeholder="sk-ant-... (overrides site key for you only)" autocomplete="off" />
+    </div>
+    <p style="font-size:.7rem;color:var(--faint);line-height:1.6">Personal key is stored in your browser only. Use this to test without touching the site key. Get yours at <strong style="color:var(--muted)">console.anthropic.com</strong></p>
+    <button class="admin-btn" onclick="saveAndApply()">Save Keys</button>
+    <div class="admin-status" id="status-api"></div>
+  </div>
+
+</div>
+```
+
   </div>
 </div>
 
@@ -381,15 +411,26 @@ a{text-decoration:none}
   </div>
 </div>
 
+<!-- Force dark theme HARD before any render — clears bad localStorage theme -->
+
 <script>
 (function(){
-  try{const s=JSON.parse(localStorage.getItem('dbsignal_v2')||'{}');document.documentElement.setAttribute('data-theme',s.theme||'dark');}
-  catch(e){document.documentElement.setAttribute('data-theme','dark');}
+  try {
+    const s = JSON.parse(localStorage.getItem('dbsignal_v2') || '{}');
+    // Always default to dark — only honour 'light' if user explicitly set it
+    const theme = s.theme === 'light' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch(e) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
 })();
 </script>
 
 <script type="module">
 
+/* ============================================================
+   MASTER FEED LIST © dbappsystems.com
+   ============================================================ */
 const MASTER_FEEDS=[
   {source:'OpenAI Blog',url:'https://openai.com/blog/rss.xml',cat:'ai-llm'},
   {source:'Anthropic News',url:'https://www.anthropic.com/rss.xml',cat:'ai-llm'},
@@ -513,12 +554,48 @@ const RSS2JSON='https://api.rss2json.com/v1/api.json?rss_url=';
 const ALLORIGINS='https://api.allorigins.win/get?url=';
 const WC_PROJECT_ID='614e499dd10274d1b266be0c640c10c1';
 
-let STATE={mode:'beards',apiKey:'',wlTitle:'InformStax',wlSub:'LLM',wlTag:'LLM · AI · Machine Learning',feeds:JSON.parse(JSON.stringify(DEFAULT_FEEDS)),articles:[],currentCat:'all',unlockCount:0};
+let STATE={
+  mode:'beards',
+  siteKey:'',   // powers Stax Edge for ALL visitors
+  apiKey:'',    // personal override — this browser only
+  wlTitle:'InformStax',wlSub:'LLM',wlTag:'LLM · AI · Machine Learning',
+  feeds:JSON.parse(JSON.stringify(DEFAULT_FEEDS)),
+  articles:[],currentCat:'all',unlockCount:0
+};
 let walletState={connected:false,accountId:null,provider:null};
 
-function loadState(){try{const s=JSON.parse(localStorage.getItem('dbsignal_v2')||'{}');if(s.mode)STATE.mode=s.mode;if(s.apiKey)STATE.apiKey=s.apiKey;STATE.wlTitle=s.wlTitle||'InformStax';STATE.wlSub=s.wlSub||'LLM';STATE.wlTag=s.wlTag||'LLM · AI · Machine Learning';if(s.feeds&&s.feeds.length)STATE.feeds=s.feeds;}catch(e){}}
-function persistState(){localStorage.setItem('dbsignal_v2',JSON.stringify({mode:STATE.mode,apiKey:STATE.apiKey,wlTitle:STATE.wlTitle,wlSub:STATE.wlSub,wlTag:STATE.wlTag,feeds:STATE.feeds}));}
+/* ============================================================
+   KEY RESOLUTION — site key first, personal key overrides
+   ============================================================ */
+function getActiveKey(){return STATE.apiKey||STATE.siteKey||'';}
 
+/* ============================================================
+   PERSIST
+   ============================================================ */
+function loadState(){
+  try{
+    const s=JSON.parse(localStorage.getItem('dbsignal_v2')||'{}');
+    if(s.mode)STATE.mode=s.mode;
+    if(s.apiKey)STATE.apiKey=s.apiKey;
+    if(s.siteKey)STATE.siteKey=s.siteKey;
+    STATE.wlTitle=s.wlTitle||'InformStax';
+    STATE.wlSub=s.wlSub||'LLM';
+    STATE.wlTag=s.wlTag||'LLM · AI · Machine Learning';
+    if(s.feeds&&s.feeds.length)STATE.feeds=s.feeds;
+  }catch(e){}
+}
+function persistState(){
+  localStorage.setItem('dbsignal_v2',JSON.stringify({
+    mode:STATE.mode,apiKey:STATE.apiKey,siteKey:STATE.siteKey,
+    wlTitle:STATE.wlTitle,wlSub:STATE.wlSub,wlTag:STATE.wlTag,
+    feeds:STATE.feeds,
+    theme:document.documentElement.getAttribute('data-theme')
+  }));
+}
+
+/* ============================================================
+   MASTER DROPDOWN
+   ============================================================ */
 function buildMasterDropdown(){
   const sel=document.getElementById('master-feed-select');
   const groups={};
@@ -534,52 +611,170 @@ function fillFromMaster(){
   try{const f=JSON.parse(sel.value);document.getElementById('new-feed-url').value=f.url;document.getElementById('new-feed-source').value=f.source;document.getElementById('new-feed-cat').value=f.cat;setStatus('status-feeds',`✓ ${f.source} loaded — click "+ Add Feed" to confirm.`,'ok');}catch(e){}
 }
 
+/* ============================================================
+   THEME
+   ============================================================ */
 function setThemeLabel(){document.getElementById('theme-label').textContent=document.documentElement.getAttribute('data-theme')==='dark'?'Dark':'Light';}
-function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);setThemeLabel();try{const s=JSON.parse(localStorage.getItem('dbsignal_v2')||'{}');s.theme=t;localStorage.setItem('dbsignal_v2',JSON.stringify(s));}catch(e){}}
+function toggleTheme(){
+  const html=document.documentElement;
+  const t=html.getAttribute('data-theme')==='dark'?'light':'dark';
+  html.setAttribute('data-theme',t);
+  setThemeLabel();
+  // persist theme immediately
+  try{const s=JSON.parse(localStorage.getItem('dbsignal_v2')||'{}');s.theme=t;localStorage.setItem('dbsignal_v2',JSON.stringify(s));}catch(e){}
+}
 
+/* ============================================================
+   ADMIN
+   ============================================================ */
 document.getElementById('logo-trigger').addEventListener('click',()=>{STATE.unlockCount++;if(STATE.unlockCount>=5){STATE.unlockCount=0;openAdmin();}});
-function openAdmin(){document.getElementById('api-key-input').value=STATE.apiKey;document.getElementById('wl-title').value=STATE.wlTitle;document.getElementById('wl-sub').value=STATE.wlSub;document.getElementById('wl-tag').value=STATE.wlTag;syncModeUI();renderFeedList();clearStatuses();document.getElementById('admin-overlay').classList.add('open');}
+function openAdmin(){
+  document.getElementById('site-key-input').value=STATE.siteKey;
+  document.getElementById('api-key-input').value=STATE.apiKey;
+  document.getElementById('wl-title').value=STATE.wlTitle;
+  document.getElementById('wl-sub').value=STATE.wlSub;
+  document.getElementById('wl-tag').value=STATE.wlTag;
+  syncModeUI();renderFeedList();clearStatuses();
+  document.getElementById('admin-overlay').classList.add('open');
+}
 function closeAdmin(){document.getElementById('admin-overlay').classList.remove('open');}
 document.getElementById('admin-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('admin-overlay'))closeAdmin();});
 function switchTab(name,btn){document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('tab-'+name).classList.add('active');}
 function clearStatuses(){['status-mode','status-feeds','status-label','status-api'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent='';el.className='admin-status';}});}
 function setStatus(id,msg,type){const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='admin-status '+(type||'');}
 
+/* ============================================================
+   MODE
+   ============================================================ */
 function toggleMode(){STATE.mode=STATE.mode==='beards'?'edge':'beards';syncModeUI();}
 function syncModeUI(){const isEdge=STATE.mode==='edge';document.getElementById('mode-big-toggle').classList.toggle('on',isEdge);document.getElementById('mode-name').textContent=isEdge?'Stax Edge (Active)':'Beards Doctrine (Default)';document.getElementById('mode-desc').textContent=isEdge?'Claude rewrites in sharp CEO voice.':'AI summary + source link. Fully compliant.';document.getElementById('mode-pill').style.display=isEdge?'flex':'none';}
 
+/* ============================================================
+   FEED MANAGER
+   ============================================================ */
 function renderFeedList(){const list=document.getElementById('feed-list');document.getElementById('feed-count').textContent=STATE.feeds.length;if(!STATE.feeds.length){list.innerHTML=`<div class="feed-empty">No feeds. Add one below.</div>`;return;}list.innerHTML=STATE.feeds.map((f,i)=>`<div class="feed-item"><div class="feed-item-source">${escHTML(f.source)}</div><div class="feed-item-url" title="${escHTML(f.url)}">${escHTML(f.url)}</div><div class="feed-item-cat">${escHTML(CAT_LABELS[f.cat]||f.cat)}</div><button class="feed-remove" onclick="removeFeed(${i})">✕</button></div>`).join('');}
 function addFeed(){const url=document.getElementById('new-feed-url').value.trim();const source=document.getElementById('new-feed-source').value.trim();const cat=document.getElementById('new-feed-cat').value;if(!url||!source){setStatus('status-feeds','⚠ Enter both URL and source name.','err');return;}try{new URL(url);}catch{setStatus('status-feeds','⚠ URL not valid.','err');return;}if(STATE.feeds.find(f=>f.url===url)){setStatus('status-feeds','⚠ Feed already in list.','err');return;}STATE.feeds.push({url,source,cat});document.getElementById('new-feed-url').value='';document.getElementById('new-feed-source').value='';document.getElementById('master-feed-select').value='';renderFeedList();setStatus('status-feeds',`✓ ${source} added.`,'ok');}
 function removeFeed(idx){const r=STATE.feeds.splice(idx,1);renderFeedList();setStatus('status-feeds',`Removed: ${r[0].source}`,'');}
 function resetFeeds(){if(!confirm('Reset to default feeds?'))return;STATE.feeds=JSON.parse(JSON.stringify(DEFAULT_FEEDS));renderFeedList();setStatus('status-feeds','✓ Reset to defaults.','ok');}
 
-function saveAndApply(){const key=document.getElementById('api-key-input').value.trim();const wlT=document.getElementById('wl-title').value.trim()||'InformStax';const wlS=document.getElementById('wl-sub').value.trim()||'LLM';const wlTag=document.getElementById('wl-tag').value.trim()||'LLM · AI · Machine Learning';if(STATE.mode==='edge'&&!key){setStatus('status-mode','⚠ API key required for Stax Edge.','err');return;}STATE.apiKey=key;STATE.wlTitle=wlT;STATE.wlSub=wlS;STATE.wlTag=wlTag;persistState();applyWhiteLabel();['status-mode','status-feeds','status-label','status-api'].forEach(id=>setStatus(id,'✓ Saved.','ok'));setTimeout(()=>{closeAdmin();loadAllFeeds();},700);}
+/* ============================================================
+   SAVE & APPLY
+   ============================================================ */
+function saveAndApply(){
+  const siteKey=document.getElementById('site-key-input').value.trim();
+  const personalKey=document.getElementById('api-key-input').value.trim();
+  const wlT=document.getElementById('wl-title').value.trim()||'InformStax';
+  const wlS=document.getElementById('wl-sub').value.trim()||'LLM';
+  const wlTag=document.getElementById('wl-tag').value.trim()||'LLM · AI · Machine Learning';
+  if(STATE.mode==='edge'&&!siteKey&&!personalKey){setStatus('status-mode','⚠ Set a Site Key or Personal Key to use Stax Edge.','err');return;}
+  STATE.siteKey=siteKey;STATE.apiKey=personalKey;
+  STATE.wlTitle=wlT;STATE.wlSub=wlS;STATE.wlTag=wlTag;
+  persistState();applyWhiteLabel();
+  ['status-mode','status-feeds','status-label','status-api'].forEach(id=>setStatus(id,'✓ Saved.','ok'));
+  setTimeout(()=>{closeAdmin();loadAllFeeds();},700);
+}
 function applyWhiteLabel(){document.getElementById('topic-label').textContent=STATE.wlTitle+' — '+STATE.wlTag;document.getElementById('nav-sub').textContent=STATE.wlSub;document.title=STATE.wlTitle+' — LLM Intelligence';}
 
+/* ============================================================
+   CATEGORIES
+   ============================================================ */
 document.getElementById('categories').addEventListener('click',e=>{const cat=e.target.dataset.cat;if(!cat)return;STATE.currentCat=cat;document.querySelectorAll('.cat').forEach(el=>el.classList.toggle('active',el.dataset.cat===cat));renderCards(STATE.articles);});
 
+/* ============================================================
+   RSS FETCH
+   ============================================================ */
 async function fetchFeed(feed){
   try{const res=await fetch(ALLORIGINS+encodeURIComponent(feed.url));const data=await res.json();if(data&&data.contents){const items=parseRSSXML(data.contents,feed);if(items.length)return items;}}catch{}
-  try{const res=await fetch(RSS2JSON+encodeURIComponent(feed.url)+'&count=3');const data=await res.json();if(data.status==='ok')return data.items.map(item=>({title:item.title||'',link:item.link||item.guid||'#',summary:stripHTML(item.description||item.content||'').slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
+  try{const res=await fetch(RSS2JSON+encodeURIComponent(feed.url)+'&count=3');const data=await res.json();if(data.status==='ok')return data.items.map(item=>({title:decodeEntities(item.title||''),link:item.link||item.guid||'#',summary:decodeEntities(stripHTML(item.description||item.content||'')).slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
   return[];
 }
-function parseRSSXML(xmlStr,feed){try{const doc=new DOMParser().parseFromString(xmlStr,'text/xml');const items=Array.from(doc.querySelectorAll('item, entry')).slice(0,3);return items.map(item=>{const get=tag=>item.querySelector(tag)?.textContent?.trim()||'';const link=get('link')||item.querySelector('link')?.getAttribute('href')||'#';const desc=get('description')||get('summary')||get('content')||'';const pub=get('pubDate')||get('published')||get('updated')||'';return{title:get('title'),link,summary:stripHTML(desc).slice(0,420),date:pub?new Date(pub).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false};}).filter(a=>a.title);}catch{return[];}}
+function parseRSSXML(xmlStr,feed){
+  try{
+    const doc=new DOMParser().parseFromString(xmlStr,'text/xml');
+    const items=Array.from(doc.querySelectorAll('item, entry')).slice(0,3);
+    return items.map(item=>{
+      const get=tag=>item.querySelector(tag)?.textContent?.trim()||'';
+      const link=get('link')||item.querySelector('link')?.getAttribute('href')||'#';
+      const desc=get('description')||get('summary')||get('content')||'';
+      const pub=get('pubDate')||get('published')||get('updated')||'';
+      return{
+        title:decodeEntities(get('title')),link,
+        summary:decodeEntities(stripHTML(desc)).slice(0,420),
+        date:pub?new Date(pub).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',
+        source:feed.source,cat:feed.cat,rewritten:null,rewriting:false
+      };
+    }).filter(a=>a.title);
+  }catch{return[];}
+}
+
+/* FIX: decode HTML entities like &quot; &amp; &lt; using a textarea */
+function decodeEntities(str){
+  const txt=document.createElement('textarea');
+  txt.innerHTML=str;
+  return txt.value;
+}
 function stripHTML(html){return html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();}
 function escHTML(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-async function loadAllFeeds(){renderSkeletons();const results=await Promise.allSettled(STATE.feeds.map(fetchFeed));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);STATE.articles=articles;renderCards(articles);}
+
+async function loadAllFeeds(){
+  renderSkeletons();
+  const results=await Promise.allSettled(STATE.feeds.map(fetchFeed));
+  let articles=[];
+  results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});
+  const seen=new Set();
+  articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});
+  articles.sort(()=>Math.random()-.5);
+  STATE.articles=articles;
+  renderCards(articles);
+}
 function renderSkeletons(){document.getElementById('feed').innerHTML=Array.from({length:6}).map(()=>`<div class="card"><div class="card-header"><div class="skeleton short"></div><div class="skeleton" style="width:50px"></div></div><div class="card-body"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton short"></div><div class="skeleton tall" style="margin-top:10px"></div></div><div class="card-footer"><div class="skeleton" style="width:60px"></div><div class="skeleton" style="width:80px"></div></div></div>`).join('');}
-function renderCards(articles){const feed=document.getElementById('feed');const list=STATE.currentCat==='all'?articles:articles.filter(a=>a.cat===STATE.currentCat);if(!list.length){feed.innerHTML=`<div class="state-box"><div class="icon">📡</div><div>No articles for this category.<br><small style="color:var(--faint)">Add feeds via Creator Settings (click logo 5×)</small></div></div>`;return;}feed.innerHTML=list.map((a,i)=>cardHTML(a,i)).join('');if(STATE.mode==='edge'&&STATE.apiKey)list.forEach((a,i)=>{if(!a.rewritten&&!a.rewriting)rewriteArticle(a,i,list);});}
-function cardHTML(a,i){const isEdge=STATE.mode==='edge';const modeTag=isEdge?`<span class="card-mode-tag tag-edge">Stax Edge</span>`:`<span class="card-mode-tag tag-beards">Beards Doctrine</span>`;let body;if(isEdge&&a.rewriting)body=`<div class="rewriting"><div class="spin"></div> Rewriting in Stax Edge...</div>`;else if(isEdge&&a.rewritten)body=formatEdgeContent(a.rewritten);else body=`<p>${escHTML(a.summary||'Fetching summary…')}</p>`;return `<div class="card${isEdge?' mode2':''}" data-idx="${i}"><div class="card-header"><div class="card-source"><div class="src-dot"></div>${escHTML(a.source)}<span style="color:var(--faint);margin-left:4px;font-size:.6rem">${escHTML(CAT_LABELS[a.cat]||a.cat)}</span></div>${modeTag}</div><div class="card-body"><div class="card-title">${escHTML(a.title)}</div><div class="card-summary">${body}</div></div><div class="card-footer"><div class="card-date">${escHTML(a.date)}</div><button class="mint-btn" onclick="openMintModal(${i})"><span>✦</span> Mint</button></div></div>`;}
+function renderCards(articles){
+  const feed=document.getElementById('feed');
+  const list=STATE.currentCat==='all'?articles:articles.filter(a=>a.cat===STATE.currentCat);
+  if(!list.length){feed.innerHTML=`<div class="state-box"><div class="icon">📡</div><div>No articles for this category.<br><small style="color:var(--faint)">Add feeds via Creator Settings (click logo 5×)</small></div></div>`;return;}
+  feed.innerHTML=list.map((a,i)=>cardHTML(a,i)).join('');
+  if(STATE.mode==='edge'&&getActiveKey())list.forEach((a,i)=>{if(!a.rewritten&&!a.rewriting)rewriteArticle(a,i,list);});
+}
+function cardHTML(a,i){
+  const isEdge=STATE.mode==='edge';
+  const modeTag=isEdge?`<span class="card-mode-tag tag-edge">Stax Edge</span>`:`<span class="card-mode-tag tag-beards">Beards Doctrine</span>`;
+  let body;
+  if(isEdge&&a.rewriting)body=`<div class="rewriting"><div class="spin"></div> Rewriting in Stax Edge...</div>`;
+  else if(isEdge&&a.rewritten)body=formatEdgeContent(a.rewritten);
+  else body=`<p>${escHTML(a.summary||'Fetching summary…')}</p>`;
+  return `<div class="card${isEdge?' mode2':''}" data-idx="${i}"><div class="card-header"><div class="card-source"><div class="src-dot"></div>${escHTML(a.source)}<span style="color:var(--faint);margin-left:4px;font-size:.6rem">${escHTML(CAT_LABELS[a.cat]||a.cat)}</span></div>${modeTag}</div><div class="card-body"><div class="card-title">${escHTML(a.title)}</div><div class="card-summary">${body}</div></div><div class="card-footer"><div class="card-date">${escHTML(a.date)}</div><button class="mint-btn" onclick="openMintModal(${i})"><span>✦</span> Mint</button></div></div>`;
+}
 function formatEdgeContent(text){const m=text.match(/bottom line[:\s]*(.*)/i);if(m){const before=text.substring(0,text.search(/bottom line/i)).trim();return `<p>${escHTML(before).replace(/\n+/g,'</p><p>')}</p><div class="bottom-line">Bottom Line: <span>${escHTML(m[1].trim())}</span></div>`;}return `<p>${escHTML(text).replace(/\n+/g,'</p><p>')}</p>`;}
 
+/* ============================================================
+   STAX EDGE REWRITE
+   ============================================================ */
 const STAX_SYS=`You are the editorial voice for InformStax, a premium intelligence platform for C-suite executives. Rewrite for technical CEOs with zero tolerance for filler. First sentence straight to the point. Max 2-3 sentences per paragraph. Active voice. No jargon. PG-13. Explain business impact. End with: "Bottom Line: [one sharp sentence]". Under 380 words. No headline.`;
-async function rewriteArticle(article,idx,list){article.rewriting=true;const cardEl=document.querySelector(`[data-idx="${idx}"]`);if(cardEl)cardEl.querySelector('.card-summary').innerHTML=`<div class="rewriting"><div class="spin"></div> Rewriting in Stax Edge...</div>`;try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':STATE.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:STAX_SYS,messages:[{role:'user',content:`Source: ${article.source}\nTitle: ${article.title}\nContent: ${article.summary}`}]})});const data=await res.json();article.rewritten=data.content?.[0]?.text||article.summary;}catch{article.rewritten=article.summary;}article.rewriting=false;if(cardEl){cardEl.querySelector('.card-summary').innerHTML=formatEdgeContent(article.rewritten);cardEl.classList.add('mode2');const tag=cardEl.querySelector('.card-mode-tag');if(tag){tag.className='card-mode-tag tag-edge';tag.textContent='Stax Edge';}}}
+async function rewriteArticle(article,idx,list){
+  article.rewriting=true;
+  const cardEl=document.querySelector(`[data-idx="${idx}"]`);
+  if(cardEl)cardEl.querySelector('.card-summary').innerHTML=`<div class="rewriting"><div class="spin"></div> Rewriting in Stax Edge...</div>`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':getActiveKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:STAX_SYS,messages:[{role:'user',content:`Source: ${article.source}\nTitle: ${article.title}\nContent: ${article.summary}`}]})
+    });
+    const data=await res.json();
+    article.rewritten=data.content?.[0]?.text||article.summary;
+  }catch{article.rewritten=article.summary;}
+  article.rewriting=false;
+  if(cardEl){cardEl.querySelector('.card-summary').innerHTML=formatEdgeContent(article.rewritten);cardEl.classList.add('mode2');const tag=cardEl.querySelector('.card-mode-tag');if(tag){tag.className='card-mode-tag tag-edge';tag.textContent='Stax Edge';}}
+}
 
+/* ============================================================
+   MINT MODAL
+   ============================================================ */
 let MINT_STATE={article:null,quoteOn:false,tier:'free',quoteText:''};
 function openMintModal(idx){const list=STATE.currentCat==='all'?STATE.articles:STATE.articles.filter(a=>a.cat===STATE.currentCat);const article=list[idx];if(!article)return;MINT_STATE={article,quoteOn:false,tier:'free',quoteText:''};document.getElementById('nft-meta-title').textContent=article.title;document.getElementById('quote-toggle').classList.remove('on');document.getElementById('nft-quote-overlay').classList.remove('show');document.getElementById('quote-desc').textContent='Add an original Stax Edge quote to your NFT';document.getElementById('wallet-install-notice').classList.remove('show');selectTier('free');document.getElementById('mint-overlay').classList.add('open');document.body.style.overflow='hidden';}
 function closeMintModal(){document.getElementById('mint-overlay').classList.remove('open');document.body.style.overflow='';}
 function selectTier(tier){MINT_STATE.tier=tier;document.getElementById('pill-free').className='tier-pill'+(tier==='free'?' active-free':'');document.getElementById('pill-premium').className='tier-pill'+(tier==='premium'?' active-premium':'');const wm=document.getElementById('nft-watermark');tier==='free'?wm.classList.add('show'):wm.classList.remove('show');const badge=document.getElementById('nft-tier-badge');if(tier==='free'){badge.textContent='Free';badge.className='nft-meta-badge badge-free';document.getElementById('tier-desc').textContent='Free includes informstax.com watermark';}else{badge.textContent='Premium';badge.className='nft-meta-badge badge-premium';document.getElementById('tier-desc').textContent='Premium NFT — clean, no watermark';}}
-async function toggleMintQuote(){const toggle=document.getElementById('quote-toggle');MINT_STATE.quoteOn=!MINT_STATE.quoteOn;toggle.classList.toggle('on',MINT_STATE.quoteOn);const overlay=document.getElementById('nft-quote-overlay');const desc=document.getElementById('quote-desc');if(!MINT_STATE.quoteOn){overlay.classList.remove('show');desc.textContent='Add an original Stax Edge quote to your NFT';return;}overlay.classList.add('show');if(MINT_STATE.quoteText){document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;return;}if(STATE.apiKey&&MINT_STATE.article){desc.textContent='✦ Generating Stax Edge quote…';document.getElementById('nft-quote-text').textContent='…';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':STATE.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:80,messages:[{role:'user',content:`Based on: "${MINT_STATE.article.title}"\nWrite ONE sharp CEO-level quote, 12-20 words. No quotes, no attribution.`}]})});const data=await res.json();MINT_STATE.quoteText=(data.content?.[0]?.text?.trim()||'Intelligence is the only asset that compounds without limit.').replace(/^["']|["']$/g,'');}catch{MINT_STATE.quoteText='Intelligence is the only asset that compounds without limit.';}document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;desc.textContent='✦ Stax Edge original quote generated';}else{MINT_STATE.quoteText='Intelligence is the only asset that compounds without limit.';document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;desc.textContent='✦ Stax Edge original quote';}}
+async function toggleMintQuote(){const toggle=document.getElementById('quote-toggle');MINT_STATE.quoteOn=!MINT_STATE.quoteOn;toggle.classList.toggle('on',MINT_STATE.quoteOn);const overlay=document.getElementById('nft-quote-overlay');const desc=document.getElementById('quote-desc');if(!MINT_STATE.quoteOn){overlay.classList.remove('show');desc.textContent='Add an original Stax Edge quote to your NFT';return;}overlay.classList.add('show');if(MINT_STATE.quoteText){document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;return;}const key=getActiveKey();if(key&&MINT_STATE.article){desc.textContent='✦ Generating Stax Edge quote…';document.getElementById('nft-quote-text').textContent='…';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:80,messages:[{role:'user',content:`Based on: "${MINT_STATE.article.title}"\nWrite ONE sharp CEO-level quote, 12-20 words. No quotes, no attribution.`}]})});const data=await res.json();MINT_STATE.quoteText=(data.content?.[0]?.text?.trim()||'Intelligence is the only asset that compounds without limit.').replace(/^["']|["']$/g,'');}catch{MINT_STATE.quoteText='Intelligence is the only asset that compounds without limit.';}document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;desc.textContent='✦ Stax Edge original quote generated';}else{MINT_STATE.quoteText='Intelligence is the only asset that compounds without limit.';document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;desc.textContent='✦ Stax Edge original quote';}}
 
 /* ============================================================
    WALLETS
@@ -588,7 +783,6 @@ function connectWalletToMint(){if(walletState.connected){executeMint();return;}d
 function openWalletSelector(){document.getElementById('wallet-selector-overlay').classList.add('open');}
 function closeWalletSelector(){document.getElementById('wallet-selector-overlay').classList.remove('open');}
 
-/* MetaMask — direct window.ethereum, no library needed */
 async function connectMetaMask(){
   closeWalletSelector();
   if(!window.ethereum||!window.ethereum.isMetaMask){
@@ -596,8 +790,7 @@ async function connectMetaMask(){
     document.getElementById('wallet-install-title').textContent='MetaMask not detected';
     document.getElementById('wallet-install-link').textContent='Download MetaMask →';
     document.getElementById('wallet-install-link').onclick=()=>window.open('https://metamask.io/download/','_blank');
-    n.classList.add('show');
-    return;
+    n.classList.add('show');return;
   }
   setMintBtn('busy','Connecting to MetaMask…');
   try{
@@ -613,46 +806,26 @@ async function connectMetaMask(){
   }
 }
 
-/* HashPack — routes through WalletConnect v2 (HashPack supports WC natively) */
 async function connectHashPack(){
   closeWalletSelector();
   setMintBtn('busy','Opening HashPack via WalletConnect…');
   try{
     const{WalletConnectModal}=await import('https://esm.sh/@walletconnect/modal@2.7.0');
-    const modal=new WalletConnectModal({
-      projectId:WC_PROJECT_ID,
-      chains:['hedera:mainnet'],
-      themeMode:'dark',
-      themeVariables:{'--wcm-accent-color':'#E8C547','--wcm-background-color':'#080808'},
-    });
+    const modal=new WalletConnectModal({projectId:WC_PROJECT_ID,chains:['hedera:mainnet'],themeMode:'dark',themeVariables:{'--wcm-accent-color':'#E8C547','--wcm-background-color':'#080808'}});
     modal.subscribeModal(state=>{if(!state.open)setMintBtn('idle','Connect Wallet to Mint');});
     await modal.openModal();
-  }catch(err){
-    console.error('HashPack/WC error:',err);
-    showMintErr('HashPack connection failed. Try WalletConnect below.');
-    setMintBtn('idle','Connect Wallet to Mint');
-  }
+  }catch(err){showMintErr('HashPack connection failed. Try WalletConnect.');setMintBtn('idle','Connect Wallet to Mint');}
 }
 
-/* WalletConnect — all other wallets via QR */
 async function connectWalletConnect(){
   closeWalletSelector();
   setMintBtn('busy','Loading WalletConnect…');
   try{
     const{WalletConnectModal}=await import('https://esm.sh/@walletconnect/modal@2.7.0');
-    const modal=new WalletConnectModal({
-      projectId:WC_PROJECT_ID,
-      chains:['eip155:1'],
-      themeMode:'dark',
-      themeVariables:{'--wcm-accent-color':'#E8C547','--wcm-background-color':'#080808'},
-    });
+    const modal=new WalletConnectModal({projectId:WC_PROJECT_ID,chains:['eip155:1'],themeMode:'dark',themeVariables:{'--wcm-accent-color':'#E8C547','--wcm-background-color':'#080808'}});
     modal.subscribeModal(state=>{if(!state.open)setMintBtn('idle','Connect Wallet to Mint');});
     await modal.openModal();
-  }catch(err){
-    console.error('WalletConnect error:',err);
-    showMintErr('WalletConnect failed. Try MetaMask instead.');
-    setMintBtn('idle','Connect Wallet to Mint');
-  }
+  }catch(err){showMintErr('WalletConnect failed. Try MetaMask instead.');setMintBtn('idle','Connect Wallet to Mint');}
 }
 
 function onWalletConnected(accountId,provider){walletState={connected:true,accountId,provider};document.getElementById('wallet-connected-id').textContent=accountId;document.getElementById('wallet-connected-bar').classList.add('show');setMintBtn('ready','✦ Mint Now');}
@@ -661,6 +834,9 @@ function setMintBtn(state,label){const btn=document.getElementById('mint-connect
 function showMintErr(msg){const btn=document.getElementById('mint-connect-btn');btn.textContent='⚠ '+msg;btn.style.background='#1a0000';btn.style.color='#ff6b6b';setTimeout(()=>{btn.textContent=walletState.connected?'✦ Mint Now':'Connect Wallet to Mint';btn.style.background=walletState.connected?'#5cb85c':'#E8C547';btn.style.color=walletState.connected?'#fff':'#080808';},4000);}
 function executeMint(){showMintErr('Minting coming in next build!');}
 
+/* ============================================================
+   INIT
+   ============================================================ */
 function init(){
   loadState();applyWhiteLabel();syncModeUI();setThemeLabel();buildMasterDropdown();loadAllFeeds();
   document.getElementById('mint-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('mint-overlay'))closeMintModal();});
