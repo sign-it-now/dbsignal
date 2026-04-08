@@ -7,454 +7,201 @@
 <title>InformStax — LLM Intelligence</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-/* ============================================================
-   THEME TOKENS
-   ============================================================ */
-:root {
-  --bg:#080808; --bg2:#0d0d0d; --bg3:#111;
-  --border:#1c1c1c; --border2:#252525;
-  --text:#f0ede6; --muted:#888; --faint:#4a4a4a;
-  --accent:#E8C547; --accent2:#c8a030; --accent-text:#080808;
-  --ticker-bg:#0a0a0a; --card-bg:#0d0d0d;
-  --admin-bg:#08080f; --mode2-glow:rgba(232,197,71,0.06);
-}
-:root[data-theme="dark"] {
-  --bg:#080808; --bg2:#0d0d0d; --bg3:#111;
-  --border:#1c1c1c; --border2:#252525;
-  --text:#f0ede6; --muted:#888; --faint:#4a4a4a;
-  --accent:#E8C547; --accent2:#c8a030; --accent-text:#080808;
-  --ticker-bg:#0a0a0a; --card-bg:#0d0d0d;
-  --admin-bg:#08080f; --mode2-glow:rgba(232,197,71,0.06);
-}
-:root[data-theme="light"] {
-  --bg:#f4f2ee; --bg2:#ffffff; --bg3:#fafaf8;
-  --border:#dedad2; --border2:#ccc9c0;
-  --text:#1a1814; --muted:#6b6860; --faint:#aaa;
-  --accent:#b8960a; --accent2:#9a7c08; --accent-text:#ffffff;
-  --ticker-bg:#1a1814; --card-bg:#ffffff;
-  --admin-bg:#f0eef8; --mode2-glow:rgba(184,150,10,0.06);
-}
-
-/* ============================================================
-RESET & BASE
-============================================================ */
+:root{--bg:#080808;--bg2:#0d0d0d;--bg3:#111;--border:#1c1c1c;--border2:#252525;--text:#f0ede6;--muted:#888;--faint:#4a4a4a;--accent:#E8C547;--accent2:#c8a030;--accent-text:#080808;--ticker-bg:#0a0a0a;--card-bg:#0d0d0d;--admin-bg:#08080f;--mode2-glow:rgba(232,197,71,0.06)}
+:root[data-theme="dark"]{--bg:#080808;--bg2:#0d0d0d;--bg3:#111;--border:#1c1c1c;--border2:#252525;--text:#f0ede6;--muted:#888;--faint:#4a4a4a;--accent:#E8C547;--accent2:#c8a030;--accent-text:#080808;--ticker-bg:#0a0a0a;--card-bg:#0d0d0d;--admin-bg:#08080f;--mode2-glow:rgba(232,197,71,0.06)}
+:root[data-theme="light"]{--bg:#f4f2ee;--bg2:#ffffff;--bg3:#fafaf8;--border:#dedad2;--border2:#ccc9c0;--text:#1a1814;--muted:#6b6860;--faint:#aaa;--accent:#b8960a;--accent2:#9a7c08;--accent-text:#ffffff;--ticker-bg:#1a1814;--card-bg:#ffffff;--admin-bg:#f0eef8;--mode2-glow:rgba(184,150,10,0.06)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;background:#080808;color:#f0ede6}
-body{
-background:var(–bg);color:var(–text);
-font-family:‘DM Sans’,sans-serif;font-size:15px;
-line-height:1.6;transition:background .3s,color .3s;
-}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;transition:background .3s,color .3s}
 a{text-decoration:none}
-
-/* ============================================================
-NAV
-============================================================ */
-.nav{
-display:flex;align-items:center;justify-content:space-between;
-padding:.9rem 2rem;border-bottom:1px solid var(–border);
-position:sticky;top:0;background:var(–bg);
--webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
-z-index:100;gap:1rem;opacity:1 !important;
-}
-.logo{
-font-family:‘Syne’,sans-serif;font-weight:800;font-size:1.35rem;
-letter-spacing:-.02em;color:var(–text);cursor:pointer;user-select:none;flex-shrink:0;
-}
-.logo span{color:var(–accent)}
-.logo sub{
-font-size:.55rem;font-weight:400;color:var(–muted);
-letter-spacing:.06em;text-transform:uppercase;vertical-align:baseline;margin-left:4px;
-}
-.nav-center{font-size:.7rem;color:var(–muted);letter-spacing:.08em;text-transform:uppercase;text-align:center}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);z-index:100;gap:1rem}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.35rem;letter-spacing:-.02em;color:var(--text);cursor:pointer;user-select:none;flex-shrink:0}
+.logo span{color:var(--accent)}
+.logo sub{font-size:.55rem;font-weight:400;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;vertical-align:baseline;margin-left:4px}
+.nav-center{font-size:.7rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;text-align:center}
 .nav-right{display:flex;align-items:center;gap:.8rem;flex-shrink:0}
 .toggle-wrap{display:flex;align-items:center;gap:6px}
-.toggle-label{font-size:.68rem;color:var(–faint);text-transform:uppercase;letter-spacing:.05em}
-.toggle{width:40px;height:22px;background:var(–border2);border-radius:11px;position:relative;cursor:pointer;border:1px solid var(–border2)}
-.toggle-knob{position:absolute;top:3px;left:3px;width:14px;height:14px;background:var(–accent);border-radius:50%;transition:transform .25s}
-[data-theme=“light”] .toggle-knob{transform:translateX(18px)}
-.mode-pill{
-display:none;align-items:center;gap:6px;
-background:var(–mode2-glow);border:1px solid var(–accent);
-border-radius:20px;padding:.3rem .85rem;
-font-size:.72rem;color:var(–accent);font-weight:600;letter-spacing:.04em;
-}
-.mode-pill .dot{width:7px;height:7px;border-radius:50%;background:var(–accent);animation:blink 1.4s ease-in-out infinite}
+.toggle-label{font-size:.68rem;color:var(--faint);text-transform:uppercase;letter-spacing:.05em}
+.toggle{width:40px;height:22px;background:var(--border2);border-radius:11px;position:relative;cursor:pointer;border:1px solid var(--border2)}
+.toggle-knob{position:absolute;top:3px;left:3px;width:14px;height:14px;background:var(--accent);border-radius:50%;transition:transform .25s}
+[data-theme="light"] .toggle-knob{transform:translateX(18px)}
+.mode-pill{display:none;align-items:center;gap:6px;background:var(--mode2-glow);border:1px solid var(--accent);border-radius:20px;padding:.3rem .85rem;font-size:.72rem;color:var(--accent);font-weight:600;letter-spacing:.04em}
+.mode-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:blink 1.4s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* ============================================================
-TICKER
-============================================================ */
-.ticker-wrap{
-background:var(–ticker-bg);border-bottom:1px solid var(–border);
-overflow:hidden;height:32px;display:flex;align-items:center;
-}
-.ticker-inner{
-display:flex;white-space:nowrap;animation:ticker 70s linear infinite;
-font-size:.7rem;color:var(–muted);gap:3rem;
-}
-.ticker-inner .live{color:var(–accent);font-weight:700;letter-spacing:.06em}
+.ticker-wrap{background:var(--ticker-bg);border-bottom:1px solid var(--border);overflow:hidden;height:32px;display:flex;align-items:center}
+.ticker-inner{display:flex;white-space:nowrap;animation:ticker 70s linear infinite;font-size:.7rem;color:var(--muted);gap:3rem}
+.ticker-inner .live{color:var(--accent);font-weight:700;letter-spacing:.06em}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-
-/* ============================================================
-CATEGORIES
-============================================================ */
-.categories{
-display:flex;gap:.4rem;padding:1rem 2rem;
-overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(–border);
-}
+.categories{display:flex;gap:.4rem;padding:1rem 2rem;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border)}
 .categories::-webkit-scrollbar{display:none}
-.cat{
-padding:.3rem .85rem;border-radius:20px;font-size:.72rem;
-letter-spacing:.04em;text-transform:uppercase;cursor:pointer;
-border:1px solid var(–border);color:var(–muted);white-space:nowrap;
-transition:all .2s;background:transparent;
-}
-.cat:hover{border-color:var(–accent);color:var(–accent)}
-.cat.active{background:var(–accent);color:var(–accent-text);border-color:var(–accent);font-weight:600}
-
-/* ============================================================
-FEED GRID
-============================================================ */
-.feed{
-display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
-gap:1px;background:var(–border);
-}
-
-/* ============================================================
-ARTICLE CARD
-============================================================ */
-.card{background:var(–card-bg);display:flex;flex-direction:column;transition:background .2s;position:relative}
-.card.mode2{background:color-mix(in srgb,var(–card-bg) 96%,var(–accent) 4%)}
-.card-header{
-padding:1.2rem 1.4rem .8rem;border-bottom:1px solid var(–border);
-display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;
-}
-.card-source{display:flex;align-items:center;gap:6px;font-size:.65rem;color:var(–muted);text-transform:uppercase;letter-spacing:.06em}
-.src-dot{width:5px;height:5px;border-radius:50%;background:var(–accent);flex-shrink:0}
+.cat{padding:.3rem .85rem;border-radius:20px;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);color:var(--muted);white-space:nowrap;transition:all .2s;background:transparent}
+.cat:hover{border-color:var(--accent);color:var(--accent)}
+.cat.active{background:var(--accent);color:var(--accent-text);border-color:var(--accent);font-weight:600}
+.feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1px;background:var(--border)}
+.card{background:var(--card-bg);display:flex;flex-direction:column;transition:background .2s;position:relative}
+.card.mode2{background:color-mix(in srgb,var(--card-bg) 96%,var(--accent) 4%)}
+.card-header{padding:1.2rem 1.4rem .8rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem}
+.card-source{display:flex;align-items:center;gap:6px;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.src-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0}
 .card-mode-tag{font-size:.58rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;flex-shrink:0}
-.tag-beards{background:var(–border2);color:var(–muted)}
-.tag-edge{background:var(–accent);color:var(–accent-text)}
+.tag-beards{background:var(--border2);color:var(--muted)}
+.tag-edge{background:var(--accent);color:var(--accent-text)}
 .card-body{padding:1.1rem 1.4rem;flex:1}
-.card-title{font-family:‘Playfair Display’,serif;font-size:1.05rem;font-weight:700;line-height:1.38;margin-bottom:.7rem;color:var(–text)}
-.card-summary{font-size:.82rem;color:var(–muted);line-height:1.75}
-.card-summary .bottom-line{
-margin-top:.7rem;padding-top:.7rem;border-top:1px solid var(–border);
-font-size:.8rem;color:var(–accent);font-weight:600;
-}
-.card-summary .bottom-line span{color:var(–muted);font-weight:400}
-.card-footer{
-padding:.85rem 1.4rem;border-top:1px solid var(–border);
-display:flex;align-items:center;justify-content:space-between;
-}
-.card-date{font-size:.65rem;color:var(–faint)}
-.card-link{font-size:.7rem;color:var(–accent);text-decoration:none;display:flex;align-items:center;gap:4px;font-weight:500;letter-spacing:.02em;transition:opacity .2s}
-.card-link:hover{opacity:.7}
-.skeleton{
-background:linear-gradient(90deg,var(–border) 25%,var(–border2) 50%,var(–border) 75%);
-background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:4px;height:14px;margin-bottom:8px;
-}
+.card-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;line-height:1.38;margin-bottom:.7rem;color:var(--text)}
+.card-summary{font-size:.82rem;color:var(--muted);line-height:1.75}
+.card-summary .bottom-line{margin-top:.7rem;padding-top:.7rem;border-top:1px solid var(--border);font-size:.8rem;color:var(--accent);font-weight:600}
+.card-summary .bottom-line span{color:var(--muted);font-weight:400}
+.card-footer{padding:.85rem 1.4rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-date{font-size:.65rem;color:var(--faint)}
+.skeleton{background:linear-gradient(90deg,var(--border) 25%,var(--border2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:4px;height:14px;margin-bottom:8px}
 @keyframes shimmer{from{background-position:200%}to{background-position:-200%}}
 .skeleton.tall{height:60px}.skeleton.short{width:60%}
-.rewriting{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(–accent);padding:.5rem 0}
-.spin{width:14px;height:14px;border:2px solid var(–border2);border-top-color:var(–accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.rewriting{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--accent);padding:.5rem 0}
+.spin{width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* ============================================================
-DOCTRINE BAR
-============================================================ */
-.doctrine-bar{
-margin:1.5rem 2rem;padding:.8rem 1rem;
-border:1px solid var(–border);border-left:3px solid var(–accent);
-background:var(–bg2);display:flex;align-items:flex-start;gap:10px;border-radius:0 4px 4px 0;
-}
-.doctrine-icon{color:var(–accent);font-size:13px;padding-top:1px}
-.doctrine-text{font-size:.7rem;color:var(–faint);line-height:1.6}
-.doctrine-text strong{color:var(–muted);font-weight:600}
-
-/* ============================================================
-ADMIN PANEL
-============================================================ */
-.admin-overlay{
-display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);
-z-index:200;align-items:flex-start;justify-content:center;
-backdrop-filter:blur(4px);padding:2rem 1rem;overflow-y:auto;
-}
+.doctrine-bar{margin:1.5rem 2rem;padding:.8rem 1rem;border:1px solid var(--border);border-left:3px solid var(--accent);background:var(--bg2);display:flex;align-items:flex-start;gap:10px;border-radius:0 4px 4px 0}
+.doctrine-icon{color:var(--accent);font-size:13px;padding-top:1px}
+.doctrine-text{font-size:.7rem;color:var(--faint);line-height:1.6}
+.doctrine-text strong{color:var(--muted);font-weight:600}
+/* ADMIN */
+.admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-start;justify-content:center;backdrop-filter:blur(4px);padding:2rem 1rem;overflow-y:auto}
 .admin-overlay.open{display:flex}
-.admin-panel{
-background:var(–admin-bg);border:1px solid var(–border2);
-border-radius:12px;width:min(560px,100%);
-box-shadow:0 24px 80px rgba(0,0,0,.6);margin:auto;
-}
-.admin-header{
-padding:1.2rem 1.5rem;border-bottom:1px solid var(–border);
-display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;
-background:var(–admin-bg);border-radius:12px 12px 0 0;z-index:1;
-}
-.admin-title{font-family:‘Syne’,sans-serif;font-size:.95rem;font-weight:700;color:var(–accent);letter-spacing:.02em}
-.admin-close{background:none;border:none;color:var(–muted);font-size:1.2rem;cursor:pointer;padding:4px 8px;border-radius:4px;transition:background .2s}
-.admin-close:hover{background:var(–border)}
+.admin-panel{background:var(--admin-bg);border:1px solid var(--border2);border-radius:12px;width:min(560px,100%);box-shadow:0 24px 80px rgba(0,0,0,.6);margin:auto}
+.admin-header{padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--admin-bg);border-radius:12px 12px 0 0;z-index:1}
+.admin-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--accent);letter-spacing:.02em}
+.admin-close{background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;padding:4px 8px;border-radius:4px;transition:background .2s}
+.admin-close:hover{background:var(--border)}
 .admin-body{padding:1.4rem;display:flex;flex-direction:column;gap:1.4rem}
-
-/* tabs */
-.admin-tabs{display:flex;gap:2px;background:var(–bg);border-radius:8px;padding:3px}
-.admin-tab{
-flex:1;padding:.45rem .5rem;text-align:center;font-size:.72rem;
-letter-spacing:.04em;text-transform:uppercase;cursor:pointer;
-border-radius:6px;color:var(–muted);transition:all .2s;border:none;background:none;
-font-family:‘DM Sans’,sans-serif;
-}
-.admin-tab.active{background:var(–border2);color:var(–text);font-weight:600}
+.admin-tabs{display:flex;gap:2px;background:var(--bg);border-radius:8px;padding:3px}
+.admin-tab{flex:1;padding:.45rem .5rem;text-align:center;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;border-radius:6px;color:var(--muted);transition:all .2s;border:none;background:none;font-family:'DM Sans',sans-serif}
+.admin-tab.active{background:var(--border2);color:var(--text);font-weight:600}
 .tab-panel{display:none;flex-direction:column;gap:1rem}
 .tab-panel.active{display:flex}
-.admin-section-label{font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(–faint);margin-bottom:.4rem}
-.admin-input{
-width:100%;background:var(–bg);border:1px solid var(–border2);border-radius:6px;
-padding:.55rem .85rem;font-family:‘DM Sans’,sans-serif;font-size:.82rem;
-color:var(–text);outline:none;transition:border-color .2s;
-}
-.admin-input:focus{border-color:var(–accent)}
-.admin-select{
-width:100%;background:var(–bg);border:1px solid var(–border2);border-radius:6px;
-padding:.55rem .85rem;font-family:‘DM Sans’,sans-serif;font-size:.82rem;
-color:var(–text);outline:none;cursor:pointer;transition:border-color .2s;appearance:none;
-}
-.admin-select:focus{border-color:var(–accent)}
-
-/* Master list dropdown special styling */
-.master-dropdown-wrap{
-position:relative;
-background:var(–bg);border:1px solid var(–accent);border-radius:8px;
-padding:.7rem .85rem;display:flex;flex-direction:column;gap:.5rem;
-}
-.master-dropdown-label{
-font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;
-color:var(–accent);font-weight:700;display:flex;align-items:center;gap:6px;
-}
-.master-dropdown-label .star{font-size:.8rem}
-.master-select{
-width:100%;background:var(–bg2);border:1px solid var(–border2);border-radius:6px;
-padding:.6rem .85rem;font-family:‘DM Sans’,sans-serif;font-size:.8rem;
-color:var(–text);outline:none;cursor:pointer;transition:border-color .2s;appearance:none;
-background-image:url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘12’ height=‘12’ viewBox=‘0 0 12 12’%3E%3Cpath fill=’%23E8C547’ d=‘M6 8L1 3h10z’/%3E%3C/svg%3E”);
-background-repeat:no-repeat;background-position:right .85rem center;padding-right:2.5rem;
-}
-.master-select:focus{border-color:var(–accent)}
-.master-select option{background:var(–bg2);color:var(–text)}
-.master-select optgroup{background:var(–bg);color:var(–accent);font-weight:700}
-.master-hint{font-size:.65rem;color:var(–faint);font-style:italic}
-
-/* divider */
-.or-divider{
-display:flex;align-items:center;gap:.75rem;font-size:.65rem;
-color:var(–faint);text-transform:uppercase;letter-spacing:.06em;
-}
-.or-divider::before,.or-divider::after{content:’’;flex:1;height:1px;background:var(–border)}
-
-/* mode toggle row */
-.mode-toggle-row{
-display:flex;align-items:center;justify-content:space-between;
-padding:.9rem 1rem;background:var(–bg);border:1px solid var(–border);border-radius:8px;
-}
+.admin-section-label{font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:.4rem}
+.admin-input{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:.55rem .85rem;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--text);outline:none;transition:border-color .2s}
+.admin-input:focus{border-color:var(--accent)}
+.admin-select{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:.55rem .85rem;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--text);outline:none;cursor:pointer;appearance:none}
+.admin-select:focus{border-color:var(--accent)}
+.master-dropdown-wrap{background:var(--bg);border:1px solid var(--accent);border-radius:8px;padding:.7rem .85rem;display:flex;flex-direction:column;gap:.5rem}
+.master-dropdown-label{font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.master-select{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:.6rem .85rem;font-family:'DM Sans',sans-serif;font-size:.8rem;color:var(--text);outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23E8C547' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .85rem center;padding-right:2.5rem}
+.master-select:focus{border-color:var(--accent)}
+.master-hint{font-size:.65rem;color:var(--faint);font-style:italic}
+.or-divider{display:flex;align-items:center;gap:.75rem;font-size:.65rem;color:var(--faint);text-transform:uppercase;letter-spacing:.06em}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.mode-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem;background:var(--bg);border:1px solid var(--border);border-radius:8px}
 .mode-toggle-info{display:flex;flex-direction:column;gap:2px}
-.mode-toggle-name{font-size:.85rem;font-weight:600;color:var(–text)}
-.mode-toggle-desc{font-size:.7rem;color:var(–muted)}
-.big-toggle{
-width:52px;height:28px;background:var(–border2);border-radius:14px;
-position:relative;cursor:pointer;border:1px solid var(–border2);transition:background .25s;flex-shrink:0;
-}
-.big-toggle.on{background:var(–accent)}
-.big-toggle-knob{
-position:absolute;top:4px;left:4px;width:18px;height:18px;
-background:#fff;border-radius:50%;transition:transform .25s;box-shadow:0 1px 3px rgba(0,0,0,.3);
-}
+.mode-toggle-name{font-size:.85rem;font-weight:600;color:var(--text)}
+.mode-toggle-desc{font-size:.7rem;color:var(--muted)}
+.big-toggle{width:52px;height:28px;background:var(--border2);border-radius:14px;position:relative;cursor:pointer;border:1px solid var(--border2);transition:background .25s;flex-shrink:0}
+.big-toggle.on{background:var(--accent)}
+.big-toggle-knob{position:absolute;top:4px;left:4px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .25s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .big-toggle.on .big-toggle-knob{transform:translateX(24px)}
-
-/* feed manager */
 .feed-list{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;scrollbar-width:thin}
-.feed-item{
-display:flex;align-items:center;gap:8px;
-padding:.6rem .85rem;background:var(–bg);border:1px solid var(–border);border-radius:6px;
-}
-.feed-item-source{font-size:.78rem;font-weight:600;color:var(–text);min-width:110px;flex-shrink:0}
-.feed-item-url{font-size:.65rem;color:var(–muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.feed-item-cat{
-font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;
-padding:2px 6px;border-radius:3px;background:var(–border2);color:var(–muted);flex-shrink:0;
-}
-.feed-remove{
-background:none;border:none;color:var(–faint);cursor:pointer;
-font-size:.9rem;padding:2px 4px;border-radius:3px;transition:all .2s;flex-shrink:0;
-}
+.feed-item{display:flex;align-items:center;gap:8px;padding:.6rem .85rem;background:var(--bg);border:1px solid var(--border);border-radius:6px}
+.feed-item-source{font-size:.78rem;font-weight:600;color:var(--text);min-width:110px;flex-shrink:0}
+.feed-item-url{font-size:.65rem;color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.feed-item-cat{font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;border-radius:3px;background:var(--border2);color:var(--muted);flex-shrink:0}
+.feed-remove{background:none;border:none;color:var(--faint);cursor:pointer;font-size:.9rem;padding:2px 4px;border-radius:3px;transition:all .2s;flex-shrink:0}
 .feed-remove:hover{background:rgba(217,83,79,.15);color:#d9534f}
-
-.feed-add-form{
-display:grid;grid-template-columns:1fr 1fr;gap:8px;
-padding:1rem;background:var(–bg);border:1px solid var(–border);border-radius:8px;
-}
+.feed-add-form{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:1rem;background:var(--bg);border:1px solid var(--border);border-radius:8px}
 .feed-add-form .full{grid-column:1/-1}
-.feed-empty{font-size:.75rem;color:var(–faint);text-align:center;padding:1.5rem;border:1px dashed var(–border);border-radius:6px}
-
-/* buttons */
-.admin-btn{
-background:var(–accent);color:var(–accent-text);border:none;
-padding:.6rem 1.2rem;border-radius:6px;font-family:‘DM Sans’,sans-serif;
-font-size:.82rem;font-weight:600;cursor:pointer;width:100%;
-transition:opacity .2s;letter-spacing:.02em;
-}
+.feed-empty{font-size:.75rem;color:var(--faint);text-align:center;padding:1.5rem;border:1px dashed var(--border);border-radius:6px}
+.admin-btn{background:var(--accent);color:var(--accent-text);border:none;padding:.6rem 1.2rem;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;width:100%;transition:opacity .2s;letter-spacing:.02em}
 .admin-btn:hover{opacity:.85}
-.admin-btn.secondary{background:transparent;border:1px solid var(–border2);color:var(–muted)}
-.admin-btn.secondary:hover{border-color:var(–accent);color:var(–accent)}
+.admin-btn.secondary{background:transparent;border:1px solid var(--border2);color:var(--muted)}
+.admin-btn.secondary:hover{border-color:var(--accent);color:var(--accent)}
 .admin-btn.sm{padding:.4rem .9rem;font-size:.75rem;width:auto}
-.admin-btn.danger{background:rgba(217,83,79,.15);color:#d9534f;border:1px solid rgba(217,83,79,.3)}
-.admin-btn.danger:hover{opacity:.8}
-.admin-status{font-size:.72rem;text-align:center;color:var(–muted);min-height:18px}
+.admin-status{font-size:.72rem;text-align:center;color:var(--muted);min-height:18px}
 .admin-status.ok{color:#5cb85c}.admin-status.err{color:#d9534f}
-
-/* ============================================================
-STATE BOXES
-============================================================ */
-.state-box{
-grid-column:1/-1;display:flex;flex-direction:column;
-align-items:center;justify-content:center;gap:.6rem;
-padding:5rem 2rem;color:var(–muted);font-size:.85rem;text-align:center;
-}
+.state-box{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;padding:5rem 2rem;color:var(--muted);font-size:.85rem;text-align:center}
 .state-box .icon{font-size:2rem;opacity:.4}
-
-/* ============================================================
-MINT BUTTON
-============================================================ */
-.mint-btn{
-display:flex;align-items:center;gap:5px;
-background:transparent;border:1px solid var(–accent);color:var(–accent);border-radius:20px;
-padding:.28rem .75rem;font-size:.68rem;font-weight:700;
-letter-spacing:.04em;text-transform:uppercase;cursor:pointer;
-font-family:‘DM Sans’,sans-serif;transition:all .2s;white-space:nowrap;
-}
-.mint-btn:hover{background:var(–accent);color:var(–accent-text)}
-.mint-btn .hex{font-size:.8rem}
-
-/* ============================================================
-MINT MODAL
-============================================================ */
-.mint-overlay{
-display:none;position:fixed;inset:0;
-background:rgba(0,0,0,.8);z-index:300;
-align-items:flex-end;justify-content:center;backdrop-filter:blur(6px);
-}
+/* MINT */
+.mint-btn{display:flex;align-items:center;gap:5px;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:20px;padding:.28rem .75rem;font-size:.68rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap}
+.mint-btn:hover{background:var(--accent);color:var(--accent-text)}
+.mint-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)}
 .mint-overlay.open{display:flex}
-.mint-sheet{
-background:#0d0d0d;border:1px solid #1c1c1c;
-border-radius:20px 20px 0 0;width:100%;max-width:480px;
-padding:1.5rem 1.4rem 2.2rem;
-animation:slideUp .3s cubic-bezier(.32,.72,0,1);
-max-height:92vh;overflow-y:auto;
-}
+.mint-sheet{background:#0d0d0d;border:1px solid #1c1c1c;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:1.5rem 1.4rem 2.2rem;animation:slideUp .3s cubic-bezier(.32,.72,0,1);max-height:92vh;overflow-y:auto}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .mint-handle{width:36px;height:4px;border-radius:2px;background:#333;margin:0 auto 1.4rem}
 .mint-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
-.mint-title{font-family:‘Syne’,sans-serif;font-size:1rem;font-weight:800;letter-spacing:-.01em;color:var(–text)}
-.mint-close{background:none;border:none;color:var(–muted);font-size:1.1rem;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .2s}
+.mint-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;letter-spacing:-.01em;color:var(--text)}
+.mint-close{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .2s}
 .mint-close:hover{background:#1c1c1c}
 .nft-preview{border-radius:12px;overflow:hidden;border:1px solid #252525;margin-bottom:1.2rem;background:#080808;position:relative}
-.nft-image-area{
-width:100%;aspect-ratio:1/1;
-background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#0f0f0f 100%);
-display:flex;flex-direction:column;align-items:center;justify-content:center;
-gap:.5rem;position:relative;overflow:hidden;
-}
-.nft-image-area::before{
-content:’’;position:absolute;inset:0;
-background:radial-gradient(circle at 50% 50%,rgba(232,197,71,0.04) 0%,transparent 70%);
-}
-.nft-logo-large{font-family:‘Syne’,sans-serif;font-weight:800;font-size:1.6rem;letter-spacing:-.02em;color:#333}
+.nft-image-area{width:100%;aspect-ratio:1/1;background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#0f0f0f 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;position:relative;overflow:hidden}
+.nft-image-area::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(232,197,71,0.04) 0%,transparent 70%)}
+.nft-logo-large{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;letter-spacing:-.02em;color:#333}
 .nft-logo-large span{color:rgba(232,197,71,0.3)}
 .nft-placeholder-label{font-size:.65rem;color:#333;letter-spacing:.1em;text-transform:uppercase}
 .nft-quote-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.85));padding:1.5rem 1rem .8rem;display:none}
 .nft-quote-overlay.show{display:block}
-.nft-quote-text{font-family:‘Playfair Display’,serif;font-size:.85rem;font-style:italic;color:#e8e4db;line-height:1.5;text-align:center}
-.nft-quote-gen{display:flex;align-items:center;gap:6px;font-size:.62rem;color:rgba(232,197,71,0.5);text-transform:uppercase;letter-spacing:.06em;margin-top:.4rem;justify-content:center}
-.nft-watermark{position:absolute;bottom:8px;right:10px;font-size:.58rem;color:rgba(232,197,71,0.35);letter-spacing:.06em;text-transform:uppercase;font-family:‘Syne’,sans-serif;font-weight:700;display:none}
+.nft-quote-text{font-family:'Playfair Display',serif;font-size:.85rem;font-style:italic;color:#e8e4db;line-height:1.5;text-align:center}
+.nft-watermark{position:absolute;bottom:8px;right:10px;font-size:.58rem;color:rgba(232,197,71,0.35);letter-spacing:.06em;text-transform:uppercase;font-family:'Syne',sans-serif;font-weight:700;display:none}
 .nft-watermark.show{display:block}
 .nft-meta{padding:.75rem 1rem;border-top:1px solid #1c1c1c;display:flex;align-items:center;justify-content:space-between}
-.nft-meta-title{font-size:.75rem;font-weight:600;color:var(–text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:.5rem}
+.nft-meta-title{font-size:.75rem;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:.5rem}
 .nft-meta-badge{font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;padding:3px 8px;border-radius:20px;font-weight:700;flex-shrink:0}
-.badge-free{background:rgba(232,197,71,0.12);color:var(–accent);border:1px solid rgba(232,197,71,0.3)}
-.badge-premium{background:var(–accent);color:#080808}
+.badge-free{background:rgba(232,197,71,0.12);color:var(--accent);border:1px solid rgba(232,197,71,0.3)}
+.badge-premium{background:var(--accent);color:#080808}
 .mint-controls{display:flex;flex-direction:column;gap:.85rem;margin-bottom:1.2rem}
 .mint-row{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;background:#080808;border:1px solid #1c1c1c;border-radius:10px}
 .mint-row-label{display:flex;flex-direction:column;gap:2px}
-.mint-row-name{font-size:.82rem;font-weight:600;color:var(–text)}
-.mint-row-desc{font-size:.68rem;color:var(–muted)}
+.mint-row-name{font-size:.82rem;font-weight:600;color:var(--text)}
+.mint-row-desc{font-size:.68rem;color:var(--muted)}
 .tier-pills{display:flex;gap:6px}
-.tier-pill{padding:.3rem .85rem;border-radius:20px;font-size:.72rem;font-weight:600;letter-spacing:.03em;cursor:pointer;border:1px solid #252525;color:#666;background:transparent;font-family:‘DM Sans’,sans-serif;transition:all .2s}
+.tier-pill{padding:.3rem .85rem;border-radius:20px;font-size:.72rem;font-weight:600;letter-spacing:.03em;cursor:pointer;border:1px solid #252525;color:#666;background:transparent;font-family:'DM Sans',sans-serif;transition:all .2s}
 .tier-pill.active-free{background:rgba(232,197,71,0.12);color:#E8C547;border-color:rgba(232,197,71,0.4)}
 .tier-pill.active-premium{background:#E8C547;color:#080808;border-color:#E8C547}
-.mint-connect-btn{
-width:100%;padding:.9rem;border-radius:12px;
-background:#E8C547 !important;color:#080808 !important;
-border:none;font-family:‘Syne’,sans-serif;font-weight:800;
-font-size:.95rem;letter-spacing:.02em;cursor:pointer;
-transition:opacity .2s;margin-bottom:.6rem;
--webkit-appearance:none !important;appearance:none;box-shadow:none;outline:none;
-}
-.mint-connect-btn:hover{opacity:.88}
-.mint-copyright{text-align:center;font-size:.58rem;color:#333;letter-spacing:.05em;text-transform:uppercase}
-
-/* Wallet */
 .wallet-connected-bar{display:none;align-items:center;justify-content:space-between;padding:.7rem 1rem;background:#080808;border:1px solid rgba(232,197,71,0.3);border-radius:10px;margin-bottom:.8rem}
 .wallet-connected-bar.show{display:flex}
 .wallet-connected-info{display:flex;align-items:center;gap:8px}
 .wallet-connected-dot{width:8px;height:8px;border-radius:50%;background:#5cb85c;animation:blink 2s ease-in-out infinite}
-.wallet-connected-id{font-size:.75rem;color:#E8C547;font-weight:600;font-family:‘Syne’,sans-serif}
-.wallet-disconnect-btn{font-size:.65rem;color:#666;background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;font-family:‘DM Sans’,sans-serif;transition:color .2s}
+.wallet-connected-id{font-size:.75rem;color:#E8C547;font-weight:600;font-family:'Syne',sans-serif}
+.wallet-disconnect-btn{font-size:.65rem;color:#666;background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;font-family:'DM Sans',sans-serif;transition:color .2s}
 .wallet-disconnect-btn:hover{color:#d9534f}
+.mint-connect-btn{width:100%;padding:.9rem;border-radius:12px;background:#E8C547 !important;color:#080808 !important;border:none;font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;letter-spacing:.02em;cursor:pointer;transition:opacity .2s;margin-bottom:.6rem;-webkit-appearance:none !important;appearance:none;box-shadow:none;outline:none}
+.mint-connect-btn:hover{opacity:.88}
+.mint-copyright{text-align:center;font-size:.58rem;color:#333;letter-spacing:.05em;text-transform:uppercase}
+.wallet-install-notice{display:none;background:#0f0800;border:1px solid rgba(246,133,27,0.3);border-radius:10px;padding:.75rem 1rem;margin-bottom:.8rem;text-align:center}
+.wallet-install-notice.show{display:block}
+.wallet-install-notice-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:#f6851b;margin-bottom:3px}
+.wallet-install-notice-sub{font-size:.7rem;color:#888}
+.wallet-install-link{font-size:.72rem;color:#E8C547;font-weight:600;text-decoration:underline;cursor:pointer;margin-left:4px}
+/* WALLET SELECTOR */
 .wallet-selector-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
 .wallet-selector-overlay.open{display:flex}
 .wallet-selector-sheet{background:#0d0d0d;border:1px solid #1c1c1c;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:1.4rem 1.4rem 2.4rem;animation:slideUp .25s cubic-bezier(.32,.72,0,1)}
 .wallet-selector-handle{width:36px;height:4px;border-radius:2px;background:#333;margin:0 auto 1.2rem}
-.wallet-selector-title{font-family:‘Syne’,sans-serif;font-weight:800;font-size:.95rem;color:#f0ede6;text-align:center;margin-bottom:1.2rem;letter-spacing:.01em}
+.wallet-selector-title{font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:#f0ede6;text-align:center;margin-bottom:1.2rem;letter-spacing:.01em}
 .wallet-option{display:flex;align-items:center;gap:1rem;padding:1rem 1.1rem;border-radius:12px;border:1px solid #1c1c1c;background:#080808;cursor:pointer;transition:all .2s;margin-bottom:.7rem;width:100%;text-align:left}
 .wallet-option:hover{border-color:#E8C547;background:#0f0f0a}
 .wallet-option-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.icon-metamask{background:linear-gradient(135deg,#f6851b,#e2761b)}
 .icon-hashpack{background:linear-gradient(135deg,#7b5ea7,#5b3f8a)}
 .icon-walletconnect{background:linear-gradient(135deg,#3b99fc,#1a6fd4)}
 .wallet-option-info{flex:1}
-.wallet-option-name{font-family:‘Syne’,sans-serif;font-weight:700;font-size:.88rem;color:#f0ede6;margin-bottom:2px}
+.wallet-option-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:#f0ede6;margin-bottom:2px}
 .wallet-option-desc{font-size:.68rem;color:#666}
-.wallet-option-badge{font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:20px;font-weight:700;flex-shrink:0;background:rgba(232,197,71,0.12);color:#E8C547;border:1px solid rgba(232,197,71,0.3)}
-.wallet-selector-cancel{width:100%;padding:.75rem;border-radius:10px;background:transparent;border:1px solid #1c1c1c;color:#666;font-family:‘DM Sans’,sans-serif;font-size:.82rem;cursor:pointer;margin-top:.3rem;transition:all .2s}
+.wallet-option-badge{font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:20px;font-weight:700;flex-shrink:0}
+.badge-hbar{background:rgba(232,197,71,0.12);color:#E8C547;border:1px solid rgba(232,197,71,0.3)}
+.badge-evm{background:rgba(246,133,27,0.12);color:#f6851b;border:1px solid rgba(246,133,27,0.3)}
+.wallet-selector-cancel{width:100%;padding:.75rem;border-radius:10px;background:transparent;border:1px solid #1c1c1c;color:#666;font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer;margin-top:.3rem;transition:all .2s}
 .wallet-selector-cancel:hover{border-color:#333;color:#888}
-
-/* ============================================================
-RESPONSIVE
-============================================================ */
 @media(max-width:640px){
-.nav{padding:.8rem 1rem}
-.nav-center{display:none}
-.feed{grid-template-columns:1fr}
-.categories{padding:.8rem 1rem}
-.doctrine-bar{margin:1rem}
-.feed-add-form{grid-template-columns:1fr}
-.feed-add-form .full{grid-column:1}
+  .nav{padding:.8rem 1rem}.nav-center{display:none}.feed{grid-template-columns:1fr}
+  .categories{padding:.8rem 1rem}.doctrine-bar{margin:1rem}
+  .feed-add-form{grid-template-columns:1fr}.feed-add-form .full{grid-column:1}
 }
 </style>
-
 </head>
 <body>
 
-<!-- NAV -->
-
 <nav class="nav">
-  <div class="logo" id="logo-trigger" title="Click 5× for creator settings">
-    INFORM<span>STAX</span><sub id="nav-sub">LLM</sub>
-  </div>
+  <div class="logo" id="logo-trigger" title="Click 5× for creator settings">INFORM<span>STAX</span><sub id="nav-sub">LLM</sub></div>
   <div class="nav-center" id="topic-label">InformStax — LLM Intelligence</div>
   <div class="nav-right">
-    <div class="mode-pill" id="mode-pill">
-      <div class="dot"></div>
-      <span id="mode-pill-label">Stax Edge</span>
-    </div>
+    <div class="mode-pill" id="mode-pill"><div class="dot"></div><span>Stax Edge</span></div>
     <div class="toggle-wrap">
       <span class="toggle-label" id="theme-label">Dark</span>
       <div class="toggle" onclick="toggleTheme()"><div class="toggle-knob"></div></div>
@@ -462,24 +209,12 @@ RESPONSIVE
   </div>
 </nav>
 
-<!-- TICKER -->
-
 <div class="ticker-wrap">
-  <div class="ticker-inner" id="ticker-inner">
-    <span class="live">LIVE</span>
-    <span>InformStax — LLM Intelligence</span>
-    <span>·</span><span>Real-time RSS from the world's top AI sources</span>
-    <span>·</span><span>Beards Doctrine Compliant — sources always credited</span>
-    <span>·</span>
-    <span class="live">LIVE</span>
-    <span>InformStax — LLM Intelligence</span>
-    <span>·</span><span>Real-time RSS from the world's top AI sources</span>
-    <span>·</span><span>Beards Doctrine Compliant — sources always credited</span>
-    <span>·</span>
+  <div class="ticker-inner">
+    <span class="live">LIVE</span><span>InformStax — LLM Intelligence</span><span>·</span><span>Real-time RSS from the world's top AI sources</span><span>·</span><span>Beards Doctrine Compliant — sources always credited</span><span>·</span>
+    <span class="live">LIVE</span><span>InformStax — LLM Intelligence</span><span>·</span><span>Real-time RSS from the world's top AI sources</span><span>·</span><span>Beards Doctrine Compliant — sources always credited</span><span>·</span>
   </div>
 </div>
-
-<!-- CATEGORIES -->
 
 <div class="categories" id="categories">
   <div class="cat active" data-cat="all">All</div>
@@ -496,24 +231,14 @@ RESPONSIVE
   <div class="cat" data-cat="space">🛸 Space</div>
 </div>
 
-<!-- FEED -->
-
 <main class="feed" id="feed"></main>
-
-<!-- DOCTRINE BAR -->
 
 <div class="doctrine-bar">
   <div class="doctrine-icon">⚖</div>
-  <div class="doctrine-text">
-    <strong>Beards Doctrine Compliant</strong> — All content is AI-curated from original sources.
-    Source publication is always credited. Original article link is always visible.
-    You are paying for the curation and editorial intelligence — not the underlying content.
-  </div>
+  <div class="doctrine-text"><strong>Beards Doctrine Compliant</strong> — All content is AI-curated from original sources. Source publication is always credited. Original article link is always visible. You are paying for the curation and editorial intelligence — not the underlying content.</div>
 </div>
 
-<!-- ============================================================
-     ADMIN PANEL — unlock by clicking logo 5×
-     ============================================================ -->
+<!-- ADMIN PANEL -->
 
 <div class="admin-overlay" id="admin-overlay">
   <div class="admin-panel">
@@ -522,176 +247,109 @@ RESPONSIVE
       <button class="admin-close" onclick="closeAdmin()">✕</button>
     </div>
     <div class="admin-body">
-
-```
-  <!-- TABS -->
-  <div class="admin-tabs">
-    <button class="admin-tab active" onclick="switchTab('mode',this)">Mode</button>
-    <button class="admin-tab" onclick="switchTab('feeds',this)">Feeds</button>
-    <button class="admin-tab" onclick="switchTab('label',this)">White Label</button>
-    <button class="admin-tab" onclick="switchTab('api',this)">API Key</button>
-  </div>
-
-  <!-- TAB: MODE -->
-  <div class="tab-panel active" id="tab-mode">
-    <div class="mode-toggle-row">
-      <div class="mode-toggle-info">
-        <div class="mode-toggle-name" id="mode-name">Beards Doctrine (Default)</div>
-        <div class="mode-toggle-desc" id="mode-desc">AI summary + source link. Fully compliant.</div>
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchTab('mode',this)">Mode</button>
+        <button class="admin-tab" onclick="switchTab('feeds',this)">Feeds</button>
+        <button class="admin-tab" onclick="switchTab('label',this)">White Label</button>
+        <button class="admin-tab" onclick="switchTab('api',this)">API Key</button>
       </div>
-      <div class="big-toggle" id="mode-big-toggle" onclick="toggleMode()">
-        <div class="big-toggle-knob"></div>
-      </div>
-    </div>
-    <p style="font-size:.72rem;color:var(--faint);line-height:1.6">
-      <strong style="color:var(--muted)">Beards Doctrine</strong> — shows an AI-generated summary with a link back to the original article. Source always credited.<br><br>
-      <strong style="color:var(--muted)">Stax Edge</strong> — Claude rewrites the full article in a sharp, direct voice built for technical CEOs. Source still credited. Requires Claude API key.
-    </p>
-    <button class="admin-btn" onclick="saveAndApply()">Save &amp; Apply</button>
-    <div class="admin-status" id="status-mode"></div>
-  </div>
-
-  <!-- TAB: FEEDS -->
-  <div class="tab-panel" id="tab-feeds">
-    <div>
-      <div class="admin-section-label">Active Feeds (<span id="feed-count">0</span>)</div>
-      <div class="feed-list" id="feed-list"></div>
-    </div>
-
-    <!-- MASTER LIST DROPDOWN -->
-    <div class="master-dropdown-wrap">
-      <div class="master-dropdown-label">
-        <span class="star">✦</span> Browse Master Feed List (100+ Sources)
-      </div>
-      <select class="master-select" id="master-feed-select" onchange="fillFromMaster()">
-        <option value="">— Choose a feed to auto-fill below —</option>
-      </select>
-      <div class="master-hint">Selecting a feed auto-fills the URL, name &amp; category below</div>
-    </div>
-
-    <div class="or-divider">or paste a custom URL</div>
-
-    <!-- ADD FORM -->
-    <div>
-      <div class="admin-section-label">Add New Feed</div>
-      <div class="feed-add-form">
-        <div class="full">
-          <input class="admin-input" type="url" id="new-feed-url" placeholder="https://example.com/feed.xml" />
+      <div class="tab-panel active" id="tab-mode">
+        <div class="mode-toggle-row">
+          <div class="mode-toggle-info">
+            <div class="mode-toggle-name" id="mode-name">Beards Doctrine (Default)</div>
+            <div class="mode-toggle-desc" id="mode-desc">AI summary + source link. Fully compliant.</div>
+          </div>
+          <div class="big-toggle" id="mode-big-toggle" onclick="toggleMode()"><div class="big-toggle-knob"></div></div>
         </div>
-        <input class="admin-input" type="text" id="new-feed-source" placeholder="Source name (e.g. Wired)" />
-        <select class="admin-select" id="new-feed-cat">
-          <option value="ai-llm">🤖 AI / LLM</option>
-          <option value="tech">💻 Tech</option>
-          <option value="cloud">☁️ Cloud</option>
-          <option value="blockchain">⛓️ Blockchain</option>
-          <option value="science">🔬 Science</option>
-          <option value="biology">🧬 Biology</option>
-          <option value="math">➗ Math</option>
-          <option value="health">💊 Health</option>
-          <option value="engineering">⚙️ Engineering</option>
-          <option value="business">👔 Business</option>
-          <option value="space">🛸 Space</option>
-        </select>
-        <div class="full">
-          <button class="admin-btn sm" onclick="addFeed()">+ Add Feed</button>
+        <p style="font-size:.72rem;color:var(--faint);line-height:1.6"><strong style="color:var(--muted)">Beards Doctrine</strong> — AI summary + source link.<br><br><strong style="color:var(--muted)">Stax Edge</strong> — Claude rewrites in sharp CEO voice. Requires API key.</p>
+        <button class="admin-btn" onclick="saveAndApply()">Save &amp; Apply</button>
+        <div class="admin-status" id="status-mode"></div>
+      </div>
+      <div class="tab-panel" id="tab-feeds">
+        <div>
+          <div class="admin-section-label">Active Feeds (<span id="feed-count">0</span>)</div>
+          <div class="feed-list" id="feed-list"></div>
         </div>
+        <div class="master-dropdown-wrap">
+          <div class="master-dropdown-label">✦ Browse Master Feed List (100+ Sources)</div>
+          <select class="master-select" id="master-feed-select" onchange="fillFromMaster()"><option value="">— Choose a feed to auto-fill below —</option></select>
+          <div class="master-hint">Selecting auto-fills URL, name &amp; category below</div>
+        </div>
+        <div class="or-divider">or paste a custom URL</div>
+        <div>
+          <div class="admin-section-label">Add New Feed</div>
+          <div class="feed-add-form">
+            <div class="full"><input class="admin-input" type="url" id="new-feed-url" placeholder="https://example.com/feed.xml" /></div>
+            <input class="admin-input" type="text" id="new-feed-source" placeholder="Source name" />
+            <select class="admin-select" id="new-feed-cat">
+              <option value="ai-llm">🤖 AI / LLM</option><option value="tech">💻 Tech</option>
+              <option value="cloud">☁️ Cloud</option><option value="blockchain">⛓️ Blockchain</option>
+              <option value="science">🔬 Science</option><option value="biology">🧬 Biology</option>
+              <option value="math">➗ Math</option><option value="health">💊 Health</option>
+              <option value="engineering">⚙️ Engineering</option><option value="business">👔 Business</option>
+              <option value="space">🛸 Space</option>
+            </select>
+            <div class="full"><button class="admin-btn sm" onclick="addFeed()">+ Add Feed</button></div>
+          </div>
+        </div>
+        <button class="admin-btn secondary" onclick="resetFeeds()">Reset to Default Feeds</button>
+        <button class="admin-btn" onclick="saveAndApply()">Save &amp; Reload Feed</button>
+        <div class="admin-status" id="status-feeds"></div>
+      </div>
+      <div class="tab-panel" id="tab-label">
+        <div><div class="admin-section-label">Blog Title</div><input class="admin-input" type="text" id="wl-title" placeholder="e.g. InformStax" /></div>
+        <div><div class="admin-section-label">Sub-label (nav)</div><input class="admin-input" type="text" id="wl-sub" placeholder="e.g. LLM" /></div>
+        <div><div class="admin-section-label">Topic Tag Line</div><input class="admin-input" type="text" id="wl-tag" placeholder="e.g. LLM · AI · Machine Learning" /></div>
+        <button class="admin-btn" onclick="saveAndApply()">Save &amp; Apply</button>
+        <div class="admin-status" id="status-label"></div>
+      </div>
+      <div class="tab-panel" id="tab-api">
+        <div><div class="admin-section-label">Claude API Key (for Stax Edge)</div><input class="admin-input" type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off" /></div>
+        <p style="font-size:.7rem;color:var(--faint);line-height:1.6">Stored locally only. Never sent anywhere except Anthropic during rewrites. Get yours at <strong style="color:var(--muted)">console.anthropic.com</strong></p>
+        <button class="admin-btn" onclick="saveAndApply()">Save Key</button>
+        <div class="admin-status" id="status-api"></div>
       </div>
     </div>
-
-    <button class="admin-btn secondary" onclick="resetFeeds()">Reset to Default Feeds</button>
-    <button class="admin-btn" onclick="saveAndApply()">Save &amp; Reload Feed</button>
-    <div class="admin-status" id="status-feeds"></div>
-  </div>
-
-  <!-- TAB: WHITE LABEL -->
-  <div class="tab-panel" id="tab-label">
-    <div>
-      <div class="admin-section-label">Blog Title</div>
-      <input class="admin-input" type="text" id="wl-title" placeholder="e.g. InformStax" />
-    </div>
-    <div>
-      <div class="admin-section-label">Sub-label (shows in nav)</div>
-      <input class="admin-input" type="text" id="wl-sub" placeholder="e.g. LLM" />
-    </div>
-    <div>
-      <div class="admin-section-label">Topic Tag Line</div>
-      <input class="admin-input" type="text" id="wl-tag" placeholder="e.g. LLM · AI · Machine Learning" />
-    </div>
-    <button class="admin-btn" onclick="saveAndApply()">Save &amp; Apply</button>
-    <div class="admin-status" id="status-label"></div>
-  </div>
-
-  <!-- TAB: API KEY -->
-  <div class="tab-panel" id="tab-api">
-    <div>
-      <div class="admin-section-label">Claude API Key (for Stax Edge)</div>
-      <input class="admin-input" type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off" />
-    </div>
-    <p style="font-size:.7rem;color:var(--faint);line-height:1.6">
-      Your key is stored locally in your browser only. It is never sent anywhere except directly to Anthropic's API during rewrites. Get your key at <strong style="color:var(--muted)">console.anthropic.com</strong>
-    </p>
-    <button class="admin-btn" onclick="saveAndApply()">Save Key</button>
-    <div class="admin-status" id="status-api"></div>
-  </div>
-
-</div>
-```
-
   </div>
 </div>
 
-<!-- ============================================================
-     MINT MODAL
-     ============================================================ -->
+<!-- MINT MODAL -->
 
 <div class="mint-overlay" id="mint-overlay">
-  <div class="mint-sheet" id="mint-sheet">
+  <div class="mint-sheet">
     <div class="mint-handle"></div>
-    <div class="mint-header">
-      <div class="mint-title">✦ Mint This Moment</div>
-      <button class="mint-close" onclick="closeMintModal()">✕</button>
-    </div>
+    <div class="mint-header"><div class="mint-title">✦ Mint This Moment</div><button class="mint-close" onclick="closeMintModal()">✕</button></div>
     <div class="nft-preview">
       <div class="nft-image-area">
         <div class="nft-logo-large">INFORM<span>STAX</span></div>
         <div class="nft-placeholder-label">Image Coming Soon</div>
         <div class="nft-quote-overlay" id="nft-quote-overlay">
           <div class="nft-quote-text" id="nft-quote-text">"The future belongs to those who act on intelligence, not just consume it."</div>
-          <div class="nft-quote-gen">✦ Stax Edge Original</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:.62rem;color:rgba(232,197,71,0.5);text-transform:uppercase;letter-spacing:.06em;margin-top:.4rem;justify-content:center">✦ Stax Edge Original</div>
         </div>
         <div class="nft-watermark" id="nft-watermark">informstax.com</div>
       </div>
-      <div class="nft-meta">
-        <div class="nft-meta-title" id="nft-meta-title">Article Title</div>
-        <div class="nft-meta-badge badge-free" id="nft-tier-badge">Free</div>
-      </div>
+      <div class="nft-meta"><div class="nft-meta-title" id="nft-meta-title">Article Title</div><div class="nft-meta-badge badge-free" id="nft-tier-badge">Free</div></div>
     </div>
     <div class="mint-controls">
       <div class="mint-row">
-        <div class="mint-row-label">
-          <div class="mint-row-name">Stax Edge Quote</div>
-          <div class="mint-row-desc" id="quote-desc">Add an original quote to your NFT</div>
-        </div>
-        <div class="big-toggle" id="quote-toggle" onclick="toggleMintQuote()">
-          <div class="big-toggle-knob"></div>
-        </div>
+        <div class="mint-row-label"><div class="mint-row-name">Stax Edge Quote</div><div class="mint-row-desc" id="quote-desc">Add an original quote to your NFT</div></div>
+        <div class="big-toggle" id="quote-toggle" onclick="toggleMintQuote()"><div class="big-toggle-knob"></div></div>
       </div>
       <div class="mint-row">
-        <div class="mint-row-label">
-          <div class="mint-row-name">NFT Tier</div>
-          <div class="mint-row-desc" id="tier-desc">Free includes informstax.com · Premium is clean</div>
-        </div>
+        <div class="mint-row-label"><div class="mint-row-name">NFT Tier</div><div class="mint-row-desc" id="tier-desc">Free includes informstax.com · Premium is clean</div></div>
         <div class="tier-pills">
           <button class="tier-pill active-free" id="pill-free" onclick="selectTier('free')">Free</button>
           <button class="tier-pill" id="pill-premium" onclick="selectTier('premium')">Premium</button>
         </div>
       </div>
     </div>
+    <div class="wallet-install-notice" id="wallet-install-notice">
+      <div class="wallet-install-notice-title" id="wallet-install-title">Wallet not detected</div>
+      <div class="wallet-install-notice-sub">Install the extension then refresh. <span class="wallet-install-link" id="wallet-install-link">Download →</span></div>
+    </div>
     <div class="wallet-connected-bar" id="wallet-connected-bar">
-      <div class="wallet-connected-info">
-        <div class="wallet-connected-dot"></div>
-        <div class="wallet-connected-id" id="wallet-connected-id">0.0.xxxxxxx</div>
-      </div>
+      <div class="wallet-connected-info"><div class="wallet-connected-dot"></div><div class="wallet-connected-id" id="wallet-connected-id">0x…</div></div>
       <button class="wallet-disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
     </div>
     <button class="mint-connect-btn" id="mint-connect-btn" onclick="connectWalletToMint()">Connect Wallet to Mint</button>
@@ -705,796 +363,318 @@ RESPONSIVE
   <div class="wallet-selector-sheet">
     <div class="wallet-selector-handle"></div>
     <div class="wallet-selector-title">Choose Your Wallet</div>
+    <button class="wallet-option" onclick="connectMetaMask()">
+      <div class="wallet-option-icon icon-metamask">🦊</div>
+      <div class="wallet-option-info"><div class="wallet-option-name">MetaMask</div><div class="wallet-option-desc">Ethereum · Chrome extension · Most popular</div></div>
+      <div class="wallet-option-badge badge-evm">EVM</div>
+    </button>
     <button class="wallet-option" onclick="connectHashPack()">
       <div class="wallet-option-icon icon-hashpack">ℍ</div>
-      <div class="wallet-option-info">
-        <div class="wallet-option-name">HashPack</div>
-        <div class="wallet-option-desc">Hedera native · Opens HashPack directly</div>
-      </div>
-      <div class="wallet-option-badge">Recommended</div>
+      <div class="wallet-option-info"><div class="wallet-option-name">HashPack</div><div class="wallet-option-desc">Hedera HBAR · Connects via WalletConnect v2</div></div>
+      <div class="wallet-option-badge badge-hbar">HBAR</div>
     </button>
     <button class="wallet-option" onclick="connectWalletConnect()">
       <div class="wallet-option-icon icon-walletconnect">⬡</div>
-      <div class="wallet-option-info">
-        <div class="wallet-option-name">WalletConnect</div>
-        <div class="wallet-option-desc">All other wallets · QR or deep link</div>
-      </div>
+      <div class="wallet-option-info"><div class="wallet-option-name">WalletConnect</div><div class="wallet-option-desc">All other wallets · QR code · Mobile</div></div>
     </button>
     <button class="wallet-selector-cancel" onclick="closeWalletSelector()">Cancel</button>
   </div>
 </div>
 
-<!-- Force dark before render -->
-
 <script>
 (function(){
-  const saved = localStorage.getItem('dbsignal_v2');
-  try {
-    const s = JSON.parse(saved || '{}');
-    document.documentElement.setAttribute('data-theme', s.theme || 'dark');
-  } catch(e) {
-    document.documentElement.setAttribute('data-theme','dark');
-  }
+  try{const s=JSON.parse(localStorage.getItem('dbsignal_v2')||'{}');document.documentElement.setAttribute('data-theme',s.theme||'dark');}
+  catch(e){document.documentElement.setAttribute('data-theme','dark');}
 })();
 </script>
 
 <script type="module">
-/* ============================================================
-   MASTER FEED LIST — All 100+ sources pre-loaded
-   © dbappsystems.com
-   ============================================================ */
-const MASTER_FEEDS = [
-  // 🤖 AI / LLM
-  { source:'OpenAI Blog',              url:'https://openai.com/blog/rss.xml',                                                  cat:'ai-llm' },
-  { source:'Anthropic News',           url:'https://www.anthropic.com/rss.xml',                                                cat:'ai-llm' },
-  { source:'Google DeepMind',          url:'https://deepmind.google/blog/rss.xml',                                             cat:'ai-llm' },
-  { source:'Hugging Face Blog',        url:'https://huggingface.co/blog/feed.xml',                                             cat:'ai-llm' },
-  { source:'MIT AI News',              url:'https://news.mit.edu/topic/artificial-intelligence2/feed',                         cat:'ai-llm' },
-  { source:'The Gradient',             url:'https://thegradient.pub/rss/',                                                     cat:'ai-llm' },
-  { source:'AI Alignment Forum',       url:'https://www.alignmentforum.org/feed.xml',                                          cat:'ai-llm' },
-  { source:'Machine Learning Mastery', url:'https://machinelearningmastery.com/feed/',                                         cat:'ai-llm' },
-  { source:'Towards Data Science',     url:'https://towardsdatascience.com/feed',                                              cat:'ai-llm' },
-  { source:'Import AI (Jack Clark)',   url:'https://jack-clark.net/feed/',                                                     cat:'ai-llm' },
-  // 💻 Tech
-  { source:'Wired',                    url:'https://www.wired.com/feed/rss',                                                   cat:'tech' },
-  { source:'Ars Technica',             url:'https://feeds.arstechnica.com/arstechnica/index',                                  cat:'tech' },
-  { source:'The Verge',                url:'https://www.theverge.com/rss/index.xml',                                           cat:'tech' },
-  { source:'TechCrunch',               url:'https://techcrunch.com/feed/',                                                    cat:'tech' },
-  { source:'MIT Technology Review',    url:'https://www.technologyreview.com/feed/',                                           cat:'tech' },
-  { source:'IEEE Spectrum',            url:'https://spectrum.ieee.org/feeds/feed.rss',                                        cat:'tech' },
-  { source:'Hacker News Top',          url:'https://news.ycombinator.com/rss',                                                 cat:'tech' },
-  { source:'ZDNet',                    url:'https://www.zdnet.com/news/rss.xml',                                               cat:'tech' },
-  { source:"Tom's Hardware",           url:'https://www.tomshardware.com/feeds/all',                                           cat:'tech' },
-  { source:'AnandTech',                url:'https://www.anandtech.com/rss/',                                                   cat:'tech' },
-  // ☁️ Cloud
-  { source:'AWS News Blog',            url:'https://aws.amazon.com/blogs/aws/feed/',                                           cat:'cloud' },
-  { source:'Google Cloud Blog',        url:'https://cloud.google.com/blog/rss',                                                cat:'cloud' },
-  { source:'Microsoft Azure Blog',     url:'https://azure.microsoft.com/en-us/blog/feed/',                                    cat:'cloud' },
-  { source:'InfoQ',                    url:'https://feed.infoq.com/',                                                          cat:'cloud' },
-  { source:'The New Stack',            url:'https://thenewstack.io/feed/',                                                     cat:'cloud' },
-  { source:'SiliconANGLE',             url:'https://siliconangle.com/feed/',                                                   cat:'cloud' },
-  // ⛓️ Blockchain
-  { source:'CoinDesk',                 url:'https://www.coindesk.com/arc/outboundfeeds/rss/',                                  cat:'blockchain' },
-  { source:'CoinTelegraph',            url:'https://cointelegraph.com/rss',                                                    cat:'blockchain' },
-  { source:'Decrypt',                  url:'https://decrypt.co/feed',                                                          cat:'blockchain' },
-  { source:'Bitcoin Magazine',         url:'https://bitcoinmagazine.com/feed',                                                 cat:'blockchain' },
-  { source:'The Block',                url:'https://www.theblock.co/rss.xml',                                                  cat:'blockchain' },
-  { source:'XRP Ledger Dev Blog',      url:'https://xrpl.org/blog/feed.xml',                                                   cat:'blockchain' },
-  { source:'Ripple Insights',          url:'https://ripple.com/insights/feed/',                                                cat:'blockchain' },
-  { source:'Ethereum Blog',            url:'https://blog.ethereum.org/feed.xml',                                               cat:'blockchain' },
-  { source:'Messari',                  url:'https://messari.io/rss',                                                           cat:'blockchain' },
-  { source:'Unchained Podcast',        url:'https://unchainedcrypto.com/feed/',                                                cat:'blockchain' },
-  { source:'Bankless',                 url:'https://www.bankless.com/feed',                                                    cat:'blockchain' },
-  { source:'Crypto Briefing',          url:'https://cryptobriefing.com/feed/',                                                 cat:'blockchain' },
-  // 🔬 Science
-  { source:'Science Magazine',         url:'https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=science',            cat:'science' },
-  { source:'Nature',                   url:'https://www.nature.com/nature.rss',                                                cat:'science' },
-  { source:'New Scientist',            url:'https://www.newscientist.com/feed/home/',                                          cat:'science' },
-  { source:'PhysicsWorld',             url:'https://physicsworld.com/feed/',                                                   cat:'science' },
-  { source:'Phys.org',                 url:'https://phys.org/rss-feed/',                                                       cat:'science' },
-  { source:'American Chemical Society',url:'https://pubs.acs.org/action/showFeed?type=axatoc&feed=rss&jc=jacsat',             cat:'science' },
-  { source:'Chemistry World',          url:'https://www.chemistryworld.com/rss',                                               cat:'science' },
-  { source:'ScienceDaily All',         url:'https://www.sciencedaily.com/rss/all.xml',                                         cat:'science' },
-  { source:'ScienceDaily Physics',     url:'https://www.sciencedaily.com/rss/matter_energy/physics.xml',                      cat:'science' },
-  { source:'ScienceDaily Chemistry',   url:'https://www.sciencedaily.com/rss/matter_energy/chemistry.xml',                    cat:'science' },
-  // 🧬 Biology
-  { source:'NIH News',                 url:'https://www.nih.gov/news-events/feed.xml',                                         cat:'biology' },
-  { source:'ScienceDaily Biology',     url:'https://www.sciencedaily.com/rss/plants_animals/biology.xml',                     cat:'biology' },
-  { source:'ScienceDaily Microbiology',url:'https://www.sciencedaily.com/rss/plants_animals/microbiology.xml',                cat:'biology' },
-  { source:'Cell Press',               url:'https://www.cell.com/cell/current.rss',                                            cat:'biology' },
-  { source:'The Scientist',            url:'https://www.the-scientist.com/rss',                                                cat:'biology' },
-  { source:'eLife Sciences',           url:'https://elifesciences.org/rss/recent.xml',                                         cat:'biology' },
-  // ➗ Math
-  { source:'American Math Society',    url:'https://www.ams.org/rss/mathmoments.xml',                                          cat:'math' },
-  { source:'arXiv Mathematics',        url:'https://arxiv.org/rss/math',                                                       cat:'math' },
-  { source:'arXiv Statistics',         url:'https://arxiv.org/rss/stat',                                                       cat:'math' },
-  { source:'Plus Magazine (Cambridge)',url:'https://plus.maths.org/content/rss.xml',                                           cat:'math' },
-  { source:'Quanta Magazine (Math)',   url:'https://www.quantamagazine.org/mathematics/feed/',                                  cat:'math' },
-  { source:'ScienceDaily Mathematics', url:'https://www.sciencedaily.com/rss/computers_math/mathematics.xml',                  cat:'math' },
-  { source:'MathOverflow',             url:'https://mathoverflow.net/feeds',                                                    cat:'math' },
-  { source:'Wolfram Blog',             url:'https://blog.wolfram.com/feed/',                                                   cat:'math' },
-  { source:'SIAM News',                url:'https://sinews.siam.org/feed/',                                                    cat:'math' },
-  // 💊 Health
-  { source:'NIH Research Matters',     url:'https://www.nih.gov/news-events/nih-research-matters/feed.xml',                    cat:'health' },
-  { source:'Harvard Health Blog',      url:'https://www.health.harvard.edu/blog/feed',                                         cat:'health' },
-  { source:'STAT News',                url:'https://www.statnews.com/feed/',                                                   cat:'health' },
-  { source:'Medscape Medical News',    url:'https://www.medscape.com/rss/medscapemedicalnews',                                  cat:'health' },
-  { source:'WebMD Health News',        url:'https://rssfeeds.webmd.com/rss/rss.aspx?RSSSource=RSS_PUBLIC',                     cat:'health' },
-  { source:'ScienceDaily Health',      url:'https://www.sciencedaily.com/rss/health_medicine.xml',                             cat:'health' },
-  { source:'The Lancet',               url:'https://www.thelancet.com/rssfeed/lancet_current.xml',                             cat:'health' },
-  { source:'NEJM',                     url:'https://www.nejm.org/action/showFeed?jc=nejm&type=etoc&feed=rss',                  cat:'health' },
-  { source:'MedCity News',             url:'https://medcitynews.com/feed/',                                                    cat:'health' },
-  { source:'Fierce Biotech',           url:'https://www.fiercebiotech.com/rss/xml',                                            cat:'health' },
-  { source:'Endpoints News',           url:'https://endpts.com/feed/',                                                         cat:'health' },
-  { source:'Genetic Engineering News', url:'https://www.genengnews.com/feed/',                                                 cat:'health' },
-  { source:'Longevity Technology',     url:'https://longevity.technology/feed/',                                                cat:'health' },
-  { source:'ScienceDaily Longevity',   url:'https://www.sciencedaily.com/rss/health_medicine/aging.xml',                       cat:'health' },
-  // ⚙️ Engineering
-  { source:'Popular Mechanics',        url:'https://www.popularmechanics.com/rss/all.xml/',                                    cat:'engineering' },
-  { source:'Popular Science',          url:'https://www.popsci.com/feed/',                                                     cat:'engineering' },
-  { source:'Scientific American',      url:'https://www.scientificamerican.com/feed/',                                         cat:'engineering' },
-  { source:'Discover Magazine',        url:'https://www.discovermagazine.com/rss',                                             cat:'engineering' },
-  { source:'Smithsonian Magazine',     url:'https://www.smithsonianmag.com/rss/',                                              cat:'engineering' },
-  { source:'Hackaday',                 url:'https://hackaday.com/feed/',                                                       cat:'engineering' },
-  { source:'Gizmodo',                  url:'https://gizmodo.com/rss',                                                          cat:'engineering' },
-  { source:'New Atlas',                url:'https://newatlas.com/index.rss',                                                   cat:'engineering' },
-  { source:'Interesting Engineering',  url:'https://interestingengineering.com/feed',                                          cat:'engineering' },
-  // 👔 Business
-  { source:'Harvard Business Review',  url:'https://hbr.org/topics/technology.rss',                                           cat:'business' },
-  { source:'Fast Company',             url:'https://www.fastcompany.com/latest/rss',                                           cat:'business' },
-  { source:'Inc. Magazine',            url:'https://www.inc.com/rss',                                                          cat:'business' },
-  { source:'Forbes Tech',              url:'https://www.forbes.com/technology/feed/',                                          cat:'business' },
-  { source:'Business Insider Tech',    url:'https://www.businessinsider.com/tech/rss',                                         cat:'business' },
-  { source:'TechRepublic',             url:'https://www.techrepublic.com/rssfeeds/articles/',                                  cat:'business' },
-  // 🛸 Space
-  { source:'NASA News',                url:'https://www.nasa.gov/rss/dyn/breaking_news.rss',                                   cat:'space' },
-  { source:'Space.com',                url:'https://www.space.com/feeds/all',                                                  cat:'space' },
-  { source:'Quantum Computing Report', url:'https://quantumcomputingreport.com/feed/',                                         cat:'space' },
-  { source:'Singularity Hub',          url:'https://singularityhub.com/feed/',                                                 cat:'space' },
-  { source:'Futurism',                 url:'https://futurism.com/feed',                                                        cat:'space' },
-  { source:'arXiv Quantum Physics',    url:'https://arxiv.org/rss/quant-ph',                                                   cat:'space' },
-  { source:'Quanta Magazine (Physics)',url:'https://www.quantamagazine.org/physics/feed/',                                     cat:'space' },
+
+const MASTER_FEEDS=[
+  {source:'OpenAI Blog',url:'https://openai.com/blog/rss.xml',cat:'ai-llm'},
+  {source:'Anthropic News',url:'https://www.anthropic.com/rss.xml',cat:'ai-llm'},
+  {source:'Google DeepMind',url:'https://deepmind.google/blog/rss.xml',cat:'ai-llm'},
+  {source:'Hugging Face Blog',url:'https://huggingface.co/blog/feed.xml',cat:'ai-llm'},
+  {source:'MIT AI News',url:'https://news.mit.edu/topic/artificial-intelligence2/feed',cat:'ai-llm'},
+  {source:'The Gradient',url:'https://thegradient.pub/rss/',cat:'ai-llm'},
+  {source:'AI Alignment Forum',url:'https://www.alignmentforum.org/feed.xml',cat:'ai-llm'},
+  {source:'Machine Learning Mastery',url:'https://machinelearningmastery.com/feed/',cat:'ai-llm'},
+  {source:'Towards Data Science',url:'https://towardsdatascience.com/feed',cat:'ai-llm'},
+  {source:'Import AI (Jack Clark)',url:'https://jack-clark.net/feed/',cat:'ai-llm'},
+  {source:'Wired',url:'https://www.wired.com/feed/rss',cat:'tech'},
+  {source:'Ars Technica',url:'https://feeds.arstechnica.com/arstechnica/index',cat:'tech'},
+  {source:'The Verge',url:'https://www.theverge.com/rss/index.xml',cat:'tech'},
+  {source:'TechCrunch',url:'https://techcrunch.com/feed/',cat:'tech'},
+  {source:'MIT Technology Review',url:'https://www.technologyreview.com/feed/',cat:'tech'},
+  {source:'IEEE Spectrum',url:'https://spectrum.ieee.org/feeds/feed.rss',cat:'tech'},
+  {source:'Hacker News Top',url:'https://news.ycombinator.com/rss',cat:'tech'},
+  {source:'ZDNet',url:'https://www.zdnet.com/news/rss.xml',cat:'tech'},
+  {source:"Tom's Hardware",url:'https://www.tomshardware.com/feeds/all',cat:'tech'},
+  {source:'AnandTech',url:'https://www.anandtech.com/rss/',cat:'tech'},
+  {source:'AWS News Blog',url:'https://aws.amazon.com/blogs/aws/feed/',cat:'cloud'},
+  {source:'Google Cloud Blog',url:'https://cloud.google.com/blog/rss',cat:'cloud'},
+  {source:'Microsoft Azure Blog',url:'https://azure.microsoft.com/en-us/blog/feed/',cat:'cloud'},
+  {source:'InfoQ',url:'https://feed.infoq.com/',cat:'cloud'},
+  {source:'The New Stack',url:'https://thenewstack.io/feed/',cat:'cloud'},
+  {source:'SiliconANGLE',url:'https://siliconangle.com/feed/',cat:'cloud'},
+  {source:'CoinDesk',url:'https://www.coindesk.com/arc/outboundfeeds/rss/',cat:'blockchain'},
+  {source:'CoinTelegraph',url:'https://cointelegraph.com/rss',cat:'blockchain'},
+  {source:'Decrypt',url:'https://decrypt.co/feed',cat:'blockchain'},
+  {source:'Bitcoin Magazine',url:'https://bitcoinmagazine.com/feed',cat:'blockchain'},
+  {source:'The Block',url:'https://www.theblock.co/rss.xml',cat:'blockchain'},
+  {source:'XRP Ledger Dev Blog',url:'https://xrpl.org/blog/feed.xml',cat:'blockchain'},
+  {source:'Ripple Insights',url:'https://ripple.com/insights/feed/',cat:'blockchain'},
+  {source:'Ethereum Blog',url:'https://blog.ethereum.org/feed.xml',cat:'blockchain'},
+  {source:'Messari',url:'https://messari.io/rss',cat:'blockchain'},
+  {source:'Unchained Podcast',url:'https://unchainedcrypto.com/feed/',cat:'blockchain'},
+  {source:'Bankless',url:'https://www.bankless.com/feed',cat:'blockchain'},
+  {source:'Crypto Briefing',url:'https://cryptobriefing.com/feed/',cat:'blockchain'},
+  {source:'Science Magazine',url:'https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=science',cat:'science'},
+  {source:'Nature',url:'https://www.nature.com/nature.rss',cat:'science'},
+  {source:'New Scientist',url:'https://www.newscientist.com/feed/home/',cat:'science'},
+  {source:'PhysicsWorld',url:'https://physicsworld.com/feed/',cat:'science'},
+  {source:'Phys.org',url:'https://phys.org/rss-feed/',cat:'science'},
+  {source:'American Chemical Society',url:'https://pubs.acs.org/action/showFeed?type=axatoc&feed=rss&jc=jacsat',cat:'science'},
+  {source:'Chemistry World',url:'https://www.chemistryworld.com/rss',cat:'science'},
+  {source:'ScienceDaily All',url:'https://www.sciencedaily.com/rss/all.xml',cat:'science'},
+  {source:'ScienceDaily Physics',url:'https://www.sciencedaily.com/rss/matter_energy/physics.xml',cat:'science'},
+  {source:'ScienceDaily Chemistry',url:'https://www.sciencedaily.com/rss/matter_energy/chemistry.xml',cat:'science'},
+  {source:'NIH News',url:'https://www.nih.gov/news-events/feed.xml',cat:'biology'},
+  {source:'ScienceDaily Biology',url:'https://www.sciencedaily.com/rss/plants_animals/biology.xml',cat:'biology'},
+  {source:'ScienceDaily Microbiology',url:'https://www.sciencedaily.com/rss/plants_animals/microbiology.xml',cat:'biology'},
+  {source:'Cell Press',url:'https://www.cell.com/cell/current.rss',cat:'biology'},
+  {source:'The Scientist',url:'https://www.the-scientist.com/rss',cat:'biology'},
+  {source:'eLife Sciences',url:'https://elifesciences.org/rss/recent.xml',cat:'biology'},
+  {source:'American Math Society',url:'https://www.ams.org/rss/mathmoments.xml',cat:'math'},
+  {source:'arXiv Mathematics',url:'https://arxiv.org/rss/math',cat:'math'},
+  {source:'arXiv Statistics',url:'https://arxiv.org/rss/stat',cat:'math'},
+  {source:'Plus Magazine (Cambridge)',url:'https://plus.maths.org/content/rss.xml',cat:'math'},
+  {source:'Quanta Magazine (Math)',url:'https://www.quantamagazine.org/mathematics/feed/',cat:'math'},
+  {source:'ScienceDaily Mathematics',url:'https://www.sciencedaily.com/rss/computers_math/mathematics.xml',cat:'math'},
+  {source:'MathOverflow',url:'https://mathoverflow.net/feeds',cat:'math'},
+  {source:'Wolfram Blog',url:'https://blog.wolfram.com/feed/',cat:'math'},
+  {source:'SIAM News',url:'https://sinews.siam.org/feed/',cat:'math'},
+  {source:'NIH Research Matters',url:'https://www.nih.gov/news-events/nih-research-matters/feed.xml',cat:'health'},
+  {source:'Harvard Health Blog',url:'https://www.health.harvard.edu/blog/feed',cat:'health'},
+  {source:'STAT News',url:'https://www.statnews.com/feed/',cat:'health'},
+  {source:'Medscape Medical News',url:'https://www.medscape.com/rss/medscapemedicalnews',cat:'health'},
+  {source:'WebMD Health News',url:'https://rssfeeds.webmd.com/rss/rss.aspx?RSSSource=RSS_PUBLIC',cat:'health'},
+  {source:'ScienceDaily Health',url:'https://www.sciencedaily.com/rss/health_medicine.xml',cat:'health'},
+  {source:'The Lancet',url:'https://www.thelancet.com/rssfeed/lancet_current.xml',cat:'health'},
+  {source:'NEJM',url:'https://www.nejm.org/action/showFeed?jc=nejm&type=etoc&feed=rss',cat:'health'},
+  {source:'MedCity News',url:'https://medcitynews.com/feed/',cat:'health'},
+  {source:'Fierce Biotech',url:'https://www.fiercebiotech.com/rss/xml',cat:'health'},
+  {source:'Endpoints News',url:'https://endpts.com/feed/',cat:'health'},
+  {source:'Genetic Engineering News',url:'https://www.genengnews.com/feed/',cat:'health'},
+  {source:'Longevity Technology',url:'https://longevity.technology/feed/',cat:'health'},
+  {source:'ScienceDaily Longevity',url:'https://www.sciencedaily.com/rss/health_medicine/aging.xml',cat:'health'},
+  {source:'Popular Mechanics',url:'https://www.popularmechanics.com/rss/all.xml/',cat:'engineering'},
+  {source:'Popular Science',url:'https://www.popsci.com/feed/',cat:'engineering'},
+  {source:'Scientific American',url:'https://www.scientificamerican.com/feed/',cat:'engineering'},
+  {source:'Discover Magazine',url:'https://www.discovermagazine.com/rss',cat:'engineering'},
+  {source:'Smithsonian Magazine',url:'https://www.smithsonianmag.com/rss/',cat:'engineering'},
+  {source:'Hackaday',url:'https://hackaday.com/feed/',cat:'engineering'},
+  {source:'Gizmodo',url:'https://gizmodo.com/rss',cat:'engineering'},
+  {source:'New Atlas',url:'https://newatlas.com/index.rss',cat:'engineering'},
+  {source:'Interesting Engineering',url:'https://interestingengineering.com/feed',cat:'engineering'},
+  {source:'Harvard Business Review',url:'https://hbr.org/topics/technology.rss',cat:'business'},
+  {source:'Fast Company',url:'https://www.fastcompany.com/latest/rss',cat:'business'},
+  {source:'Inc. Magazine',url:'https://www.inc.com/rss',cat:'business'},
+  {source:'Forbes Tech',url:'https://www.forbes.com/technology/feed/',cat:'business'},
+  {source:'Business Insider Tech',url:'https://www.businessinsider.com/tech/rss',cat:'business'},
+  {source:'TechRepublic',url:'https://www.techrepublic.com/rssfeeds/articles/',cat:'business'},
+  {source:'NASA News',url:'https://www.nasa.gov/rss/dyn/breaking_news.rss',cat:'space'},
+  {source:'Space.com',url:'https://www.space.com/feeds/all',cat:'space'},
+  {source:'Quantum Computing Report',url:'https://quantumcomputingreport.com/feed/',cat:'space'},
+  {source:'Singularity Hub',url:'https://singularityhub.com/feed/',cat:'space'},
+  {source:'Futurism',url:'https://futurism.com/feed',cat:'space'},
+  {source:'arXiv Quantum Physics',url:'https://arxiv.org/rss/quant-ph',cat:'space'},
+  {source:'Quanta Magazine (Physics)',url:'https://www.quantamagazine.org/physics/feed/',cat:'space'},
 ];
 
-/* ============================================================
-   CATEGORY CONFIG — labels & emojis for main page headings
-   ============================================================ */
-const CAT_LABELS = {
-  'ai-llm':      '🤖 AI / LLM',
-  'tech':        '💻 Tech',
-  'cloud':       '☁️ Cloud',
-  'blockchain':  '⛓️ Blockchain',
-  'science':     '🔬 Science',
-  'biology':     '🧬 Biology',
-  'math':        '➗ Math',
-  'health':      '💊 Health',
-  'engineering': '⚙️ Engineering',
-  'business':    '👔 Business',
-  'space':       '🛸 Space',
-};
+const CAT_LABELS={'ai-llm':'🤖 AI / LLM','tech':'💻 Tech','cloud':'☁️ Cloud','blockchain':'⛓️ Blockchain','science':'🔬 Science','biology':'🧬 Biology','math':'➗ Math','health':'💊 Health','engineering':'⚙️ Engineering','business':'👔 Business','space':'🛸 Space'};
 
-/* ============================================================
-   DEFAULT RSS FEEDS — LLM / AI topic
-   ============================================================ */
-const DEFAULT_FEEDS = [
-  {url:'https://openai.com/news/rss.xml',                                    source:'OpenAI',        cat:'ai-llm'},
-  {url:'https://venturebeat.com/category/ai/feed/',                          source:'VentureBeat',   cat:'ai-llm'},
-  {url:'https://feeds.arstechnica.com/arstechnica/index',                    source:'Ars Technica',  cat:'tech'},
-  {url:'https://www.wired.com/feed/tag/ai/latest/rss',                       source:'Wired',         cat:'tech'},
-  {url:'https://techcrunch.com/feed/',                                       source:'TechCrunch',    cat:'business'},
-  {url:'https://bair.berkeley.edu/blog/feed.xml',                            source:'Berkeley AI',   cat:'ai-llm'},
-  {url:'https://developer.nvidia.com/blog/feed/',                            source:'NVIDIA Dev',    cat:'tech'},
-  {url:'https://aibusiness.com/rss.xml',                                     source:'AI Business',   cat:'business'},
-  {url:'https://www.theguardian.com/technology/artificialintelligenceai/rss',source:'The Guardian',  cat:'ai-llm'},
-  {url:'https://futurism.com/categories/ai-artificial-intelligence/feed',    source:'Futurism',      cat:'ai-llm'},
-  {url:'https://machinelearningmastery.com/blog/feed',                       source:'ML Mastery',    cat:'ai-llm'},
-  {url:'https://simonwillison.net/atom/everything/',                         source:'Simon Willison',cat:'tech'},
+const DEFAULT_FEEDS=[
+  {url:'https://openai.com/news/rss.xml',source:'OpenAI',cat:'ai-llm'},
+  {url:'https://venturebeat.com/category/ai/feed/',source:'VentureBeat',cat:'ai-llm'},
+  {url:'https://feeds.arstechnica.com/arstechnica/index',source:'Ars Technica',cat:'tech'},
+  {url:'https://www.wired.com/feed/tag/ai/latest/rss',source:'Wired',cat:'tech'},
+  {url:'https://techcrunch.com/feed/',source:'TechCrunch',cat:'business'},
+  {url:'https://bair.berkeley.edu/blog/feed.xml',source:'Berkeley AI',cat:'ai-llm'},
+  {url:'https://developer.nvidia.com/blog/feed/',source:'NVIDIA Dev',cat:'tech'},
+  {url:'https://aibusiness.com/rss.xml',source:'AI Business',cat:'business'},
+  {url:'https://www.theguardian.com/technology/artificialintelligenceai/rss',source:'The Guardian',cat:'ai-llm'},
+  {url:'https://futurism.com/categories/ai-artificial-intelligence/feed',source:'Futurism',cat:'ai-llm'},
+  {url:'https://machinelearningmastery.com/blog/feed',source:'ML Mastery',cat:'ai-llm'},
+  {url:'https://simonwillison.net/atom/everything/',source:'Simon Willison',cat:'tech'},
 ];
 
-const RSS2JSON   = 'https://api.rss2json.com/v1/api.json?rss_url=';
-const ALLORIGINS = 'https://api.allorigins.win/get?url=';
+const RSS2JSON='https://api.rss2json.com/v1/api.json?rss_url=';
+const ALLORIGINS='https://api.allorigins.win/get?url=';
+const WC_PROJECT_ID='614e499dd10274d1b266be0c640c10c1';
 
-/* ============================================================
-   STATE
-   ============================================================ */
-let STATE = {
-  mode:'beards', apiKey:'',
-  wlTitle:'InformStax', wlSub:'LLM', wlTag:'LLM · AI · Machine Learning',
-  feeds: JSON.parse(JSON.stringify(DEFAULT_FEEDS)),
-  articles:[], currentCat:'all', unlockCount:0,
-};
+let STATE={mode:'beards',apiKey:'',wlTitle:'InformStax',wlSub:'LLM',wlTag:'LLM · AI · Machine Learning',feeds:JSON.parse(JSON.stringify(DEFAULT_FEEDS)),articles:[],currentCat:'all',unlockCount:0};
+let walletState={connected:false,accountId:null,provider:null};
 
-/* ============================================================
-   PERSIST
-   ============================================================ */
-function loadState() {
-  try {
-    const s = JSON.parse(localStorage.getItem('dbsignal_v2') || '{}');
-    if (s.mode)    STATE.mode    = s.mode;
-    if (s.apiKey)  STATE.apiKey  = s.apiKey;
-    STATE.wlTitle = s.wlTitle || 'InformStax';
-    STATE.wlSub   = s.wlSub   || 'LLM';
-    STATE.wlTag   = s.wlTag   || 'LLM · AI · Machine Learning';
-    if (s.feeds && s.feeds.length) STATE.feeds = s.feeds;
-  } catch(e) {}
-}
-function persistState() {
-  localStorage.setItem('dbsignal_v2', JSON.stringify({
-    mode:STATE.mode, apiKey:STATE.apiKey,
-    wlTitle:STATE.wlTitle, wlSub:STATE.wlSub, wlTag:STATE.wlTag,
-    feeds:STATE.feeds,
-  }));
-}
+function loadState(){try{const s=JSON.parse(localStorage.getItem('dbsignal_v2')||'{}');if(s.mode)STATE.mode=s.mode;if(s.apiKey)STATE.apiKey=s.apiKey;STATE.wlTitle=s.wlTitle||'InformStax';STATE.wlSub=s.wlSub||'LLM';STATE.wlTag=s.wlTag||'LLM · AI · Machine Learning';if(s.feeds&&s.feeds.length)STATE.feeds=s.feeds;}catch(e){}}
+function persistState(){localStorage.setItem('dbsignal_v2',JSON.stringify({mode:STATE.mode,apiKey:STATE.apiKey,wlTitle:STATE.wlTitle,wlSub:STATE.wlSub,wlTag:STATE.wlTag,feeds:STATE.feeds}));}
 
-/* ============================================================
-   MASTER DROPDOWN — build optgroups by category
-   ============================================================ */
-function buildMasterDropdown() {
-  const sel = document.getElementById('master-feed-select');
-  if (!sel) return;
-
-  const groups = {};
-  MASTER_FEEDS.forEach(f => {
-    if (!groups[f.cat]) groups[f.cat] = [];
-    groups[f.cat].push(f);
-  });
-
-  Object.keys(groups).forEach(cat => {
-    const og = document.createElement('optgroup');
-    og.label = CAT_LABELS[cat] || cat;
-    groups[cat].forEach(f => {
-      const opt = document.createElement('option');
-      opt.value = JSON.stringify({url:f.url, source:f.source, cat:f.cat});
-      opt.textContent = f.source;
-      og.appendChild(opt);
-    });
+function buildMasterDropdown(){
+  const sel=document.getElementById('master-feed-select');
+  const groups={};
+  MASTER_FEEDS.forEach(f=>{if(!groups[f.cat])groups[f.cat]=[];groups[f.cat].push(f);});
+  Object.keys(groups).forEach(cat=>{
+    const og=document.createElement('optgroup');og.label=CAT_LABELS[cat]||cat;
+    groups[cat].forEach(f=>{const opt=document.createElement('option');opt.value=JSON.stringify({url:f.url,source:f.source,cat:f.cat});opt.textContent=f.source;og.appendChild(opt);});
     sel.appendChild(og);
   });
 }
-
-function fillFromMaster() {
-  const sel = document.getElementById('master-feed-select');
-  if (!sel.value) return;
-  try {
-    const f = JSON.parse(sel.value);
-    document.getElementById('new-feed-url').value    = f.url;
-    document.getElementById('new-feed-source').value = f.source;
-    document.getElementById('new-feed-cat').value    = f.cat;
-    setStatus('status-feeds', `✓ ${f.source} loaded — click "+ Add Feed" to confirm.`, 'ok');
-  } catch(e) {}
+function fillFromMaster(){
+  const sel=document.getElementById('master-feed-select');if(!sel.value)return;
+  try{const f=JSON.parse(sel.value);document.getElementById('new-feed-url').value=f.url;document.getElementById('new-feed-source').value=f.source;document.getElementById('new-feed-cat').value=f.cat;setStatus('status-feeds',`✓ ${f.source} loaded — click "+ Add Feed" to confirm.`,'ok');}catch(e){}
 }
+
+function setThemeLabel(){document.getElementById('theme-label').textContent=document.documentElement.getAttribute('data-theme')==='dark'?'Dark':'Light';}
+function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);setThemeLabel();try{const s=JSON.parse(localStorage.getItem('dbsignal_v2')||'{}');s.theme=t;localStorage.setItem('dbsignal_v2',JSON.stringify(s));}catch(e){}}
+
+document.getElementById('logo-trigger').addEventListener('click',()=>{STATE.unlockCount++;if(STATE.unlockCount>=5){STATE.unlockCount=0;openAdmin();}});
+function openAdmin(){document.getElementById('api-key-input').value=STATE.apiKey;document.getElementById('wl-title').value=STATE.wlTitle;document.getElementById('wl-sub').value=STATE.wlSub;document.getElementById('wl-tag').value=STATE.wlTag;syncModeUI();renderFeedList();clearStatuses();document.getElementById('admin-overlay').classList.add('open');}
+function closeAdmin(){document.getElementById('admin-overlay').classList.remove('open');}
+document.getElementById('admin-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('admin-overlay'))closeAdmin();});
+function switchTab(name,btn){document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('tab-'+name).classList.add('active');}
+function clearStatuses(){['status-mode','status-feeds','status-label','status-api'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent='';el.className='admin-status';}});}
+function setStatus(id,msg,type){const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='admin-status '+(type||'');}
+
+function toggleMode(){STATE.mode=STATE.mode==='beards'?'edge':'beards';syncModeUI();}
+function syncModeUI(){const isEdge=STATE.mode==='edge';document.getElementById('mode-big-toggle').classList.toggle('on',isEdge);document.getElementById('mode-name').textContent=isEdge?'Stax Edge (Active)':'Beards Doctrine (Default)';document.getElementById('mode-desc').textContent=isEdge?'Claude rewrites in sharp CEO voice.':'AI summary + source link. Fully compliant.';document.getElementById('mode-pill').style.display=isEdge?'flex':'none';}
+
+function renderFeedList(){const list=document.getElementById('feed-list');document.getElementById('feed-count').textContent=STATE.feeds.length;if(!STATE.feeds.length){list.innerHTML=`<div class="feed-empty">No feeds. Add one below.</div>`;return;}list.innerHTML=STATE.feeds.map((f,i)=>`<div class="feed-item"><div class="feed-item-source">${escHTML(f.source)}</div><div class="feed-item-url" title="${escHTML(f.url)}">${escHTML(f.url)}</div><div class="feed-item-cat">${escHTML(CAT_LABELS[f.cat]||f.cat)}</div><button class="feed-remove" onclick="removeFeed(${i})">✕</button></div>`).join('');}
+function addFeed(){const url=document.getElementById('new-feed-url').value.trim();const source=document.getElementById('new-feed-source').value.trim();const cat=document.getElementById('new-feed-cat').value;if(!url||!source){setStatus('status-feeds','⚠ Enter both URL and source name.','err');return;}try{new URL(url);}catch{setStatus('status-feeds','⚠ URL not valid.','err');return;}if(STATE.feeds.find(f=>f.url===url)){setStatus('status-feeds','⚠ Feed already in list.','err');return;}STATE.feeds.push({url,source,cat});document.getElementById('new-feed-url').value='';document.getElementById('new-feed-source').value='';document.getElementById('master-feed-select').value='';renderFeedList();setStatus('status-feeds',`✓ ${source} added.`,'ok');}
+function removeFeed(idx){const r=STATE.feeds.splice(idx,1);renderFeedList();setStatus('status-feeds',`Removed: ${r[0].source}`,'');}
+function resetFeeds(){if(!confirm('Reset to default feeds?'))return;STATE.feeds=JSON.parse(JSON.stringify(DEFAULT_FEEDS));renderFeedList();setStatus('status-feeds','✓ Reset to defaults.','ok');}
+
+function saveAndApply(){const key=document.getElementById('api-key-input').value.trim();const wlT=document.getElementById('wl-title').value.trim()||'InformStax';const wlS=document.getElementById('wl-sub').value.trim()||'LLM';const wlTag=document.getElementById('wl-tag').value.trim()||'LLM · AI · Machine Learning';if(STATE.mode==='edge'&&!key){setStatus('status-mode','⚠ API key required for Stax Edge.','err');return;}STATE.apiKey=key;STATE.wlTitle=wlT;STATE.wlSub=wlS;STATE.wlTag=wlTag;persistState();applyWhiteLabel();['status-mode','status-feeds','status-label','status-api'].forEach(id=>setStatus(id,'✓ Saved.','ok'));setTimeout(()=>{closeAdmin();loadAllFeeds();},700);}
+function applyWhiteLabel(){document.getElementById('topic-label').textContent=STATE.wlTitle+' — '+STATE.wlTag;document.getElementById('nav-sub').textContent=STATE.wlSub;document.title=STATE.wlTitle+' — LLM Intelligence';}
+
+document.getElementById('categories').addEventListener('click',e=>{const cat=e.target.dataset.cat;if(!cat)return;STATE.currentCat=cat;document.querySelectorAll('.cat').forEach(el=>el.classList.toggle('active',el.dataset.cat===cat));renderCards(STATE.articles);});
+
+async function fetchFeed(feed){
+  try{const res=await fetch(ALLORIGINS+encodeURIComponent(feed.url));const data=await res.json();if(data&&data.contents){const items=parseRSSXML(data.contents,feed);if(items.length)return items;}}catch{}
+  try{const res=await fetch(RSS2JSON+encodeURIComponent(feed.url)+'&count=3');const data=await res.json();if(data.status==='ok')return data.items.map(item=>({title:item.title||'',link:item.link||item.guid||'#',summary:stripHTML(item.description||item.content||'').slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
+  return[];
+}
+function parseRSSXML(xmlStr,feed){try{const doc=new DOMParser().parseFromString(xmlStr,'text/xml');const items=Array.from(doc.querySelectorAll('item, entry')).slice(0,3);return items.map(item=>{const get=tag=>item.querySelector(tag)?.textContent?.trim()||'';const link=get('link')||item.querySelector('link')?.getAttribute('href')||'#';const desc=get('description')||get('summary')||get('content')||'';const pub=get('pubDate')||get('published')||get('updated')||'';return{title:get('title'),link,summary:stripHTML(desc).slice(0,420),date:pub?new Date(pub).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false};}).filter(a=>a.title);}catch{return[];}}
+function stripHTML(html){return html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();}
+function escHTML(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+async function loadAllFeeds(){renderSkeletons();const results=await Promise.allSettled(STATE.feeds.map(fetchFeed));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);STATE.articles=articles;renderCards(articles);}
+function renderSkeletons(){document.getElementById('feed').innerHTML=Array.from({length:6}).map(()=>`<div class="card"><div class="card-header"><div class="skeleton short"></div><div class="skeleton" style="width:50px"></div></div><div class="card-body"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton short"></div><div class="skeleton tall" style="margin-top:10px"></div></div><div class="card-footer"><div class="skeleton" style="width:60px"></div><div class="skeleton" style="width:80px"></div></div></div>`).join('');}
+function renderCards(articles){const feed=document.getElementById('feed');const list=STATE.currentCat==='all'?articles:articles.filter(a=>a.cat===STATE.currentCat);if(!list.length){feed.innerHTML=`<div class="state-box"><div class="icon">📡</div><div>No articles for this category.<br><small style="color:var(--faint)">Add feeds via Creator Settings (click logo 5×)</small></div></div>`;return;}feed.innerHTML=list.map((a,i)=>cardHTML(a,i)).join('');if(STATE.mode==='edge'&&STATE.apiKey)list.forEach((a,i)=>{if(!a.rewritten&&!a.rewriting)rewriteArticle(a,i,list);});}
+function cardHTML(a,i){const isEdge=STATE.mode==='edge';const modeTag=isEdge?`<span class="card-mode-tag tag-edge">Stax Edge</span>`:`<span class="card-mode-tag tag-beards">Beards Doctrine</span>`;let body;if(isEdge&&a.rewriting)body=`<div class="rewriting"><div class="spin"></div> Rewriting in Stax Edge...</div>`;else if(isEdge&&a.rewritten)body=formatEdgeContent(a.rewritten);else body=`<p>${escHTML(a.summary||'Fetching summary…')}</p>`;return `<div class="card${isEdge?' mode2':''}" data-idx="${i}"><div class="card-header"><div class="card-source"><div class="src-dot"></div>${escHTML(a.source)}<span style="color:var(--faint);margin-left:4px;font-size:.6rem">${escHTML(CAT_LABELS[a.cat]||a.cat)}</span></div>${modeTag}</div><div class="card-body"><div class="card-title">${escHTML(a.title)}</div><div class="card-summary">${body}</div></div><div class="card-footer"><div class="card-date">${escHTML(a.date)}</div><button class="mint-btn" onclick="openMintModal(${i})"><span>✦</span> Mint</button></div></div>`;}
+function formatEdgeContent(text){const m=text.match(/bottom line[:\s]*(.*)/i);if(m){const before=text.substring(0,text.search(/bottom line/i)).trim();return `<p>${escHTML(before).replace(/\n+/g,'</p><p>')}</p><div class="bottom-line">Bottom Line: <span>${escHTML(m[1].trim())}</span></div>`;}return `<p>${escHTML(text).replace(/\n+/g,'</p><p>')}</p>`;}
+
+const STAX_SYS=`You are the editorial voice for InformStax, a premium intelligence platform for C-suite executives. Rewrite for technical CEOs with zero tolerance for filler. First sentence straight to the point. Max 2-3 sentences per paragraph. Active voice. No jargon. PG-13. Explain business impact. End with: "Bottom Line: [one sharp sentence]". Under 380 words. No headline.`;
+async function rewriteArticle(article,idx,list){article.rewriting=true;const cardEl=document.querySelector(`[data-idx="${idx}"]`);if(cardEl)cardEl.querySelector('.card-summary').innerHTML=`<div class="rewriting"><div class="spin"></div> Rewriting in Stax Edge...</div>`;try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':STATE.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:STAX_SYS,messages:[{role:'user',content:`Source: ${article.source}\nTitle: ${article.title}\nContent: ${article.summary}`}]})});const data=await res.json();article.rewritten=data.content?.[0]?.text||article.summary;}catch{article.rewritten=article.summary;}article.rewriting=false;if(cardEl){cardEl.querySelector('.card-summary').innerHTML=formatEdgeContent(article.rewritten);cardEl.classList.add('mode2');const tag=cardEl.querySelector('.card-mode-tag');if(tag){tag.className='card-mode-tag tag-edge';tag.textContent='Stax Edge';}}}
+
+let MINT_STATE={article:null,quoteOn:false,tier:'free',quoteText:''};
+function openMintModal(idx){const list=STATE.currentCat==='all'?STATE.articles:STATE.articles.filter(a=>a.cat===STATE.currentCat);const article=list[idx];if(!article)return;MINT_STATE={article,quoteOn:false,tier:'free',quoteText:''};document.getElementById('nft-meta-title').textContent=article.title;document.getElementById('quote-toggle').classList.remove('on');document.getElementById('nft-quote-overlay').classList.remove('show');document.getElementById('quote-desc').textContent='Add an original Stax Edge quote to your NFT';document.getElementById('wallet-install-notice').classList.remove('show');selectTier('free');document.getElementById('mint-overlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeMintModal(){document.getElementById('mint-overlay').classList.remove('open');document.body.style.overflow='';}
+function selectTier(tier){MINT_STATE.tier=tier;document.getElementById('pill-free').className='tier-pill'+(tier==='free'?' active-free':'');document.getElementById('pill-premium').className='tier-pill'+(tier==='premium'?' active-premium':'');const wm=document.getElementById('nft-watermark');tier==='free'?wm.classList.add('show'):wm.classList.remove('show');const badge=document.getElementById('nft-tier-badge');if(tier==='free'){badge.textContent='Free';badge.className='nft-meta-badge badge-free';document.getElementById('tier-desc').textContent='Free includes informstax.com watermark';}else{badge.textContent='Premium';badge.className='nft-meta-badge badge-premium';document.getElementById('tier-desc').textContent='Premium NFT — clean, no watermark';}}
+async function toggleMintQuote(){const toggle=document.getElementById('quote-toggle');MINT_STATE.quoteOn=!MINT_STATE.quoteOn;toggle.classList.toggle('on',MINT_STATE.quoteOn);const overlay=document.getElementById('nft-quote-overlay');const desc=document.getElementById('quote-desc');if(!MINT_STATE.quoteOn){overlay.classList.remove('show');desc.textContent='Add an original Stax Edge quote to your NFT';return;}overlay.classList.add('show');if(MINT_STATE.quoteText){document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;return;}if(STATE.apiKey&&MINT_STATE.article){desc.textContent='✦ Generating Stax Edge quote…';document.getElementById('nft-quote-text').textContent='…';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':STATE.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:80,messages:[{role:'user',content:`Based on: "${MINT_STATE.article.title}"\nWrite ONE sharp CEO-level quote, 12-20 words. No quotes, no attribution.`}]})});const data=await res.json();MINT_STATE.quoteText=(data.content?.[0]?.text?.trim()||'Intelligence is the only asset that compounds without limit.').replace(/^["']|["']$/g,'');}catch{MINT_STATE.quoteText='Intelligence is the only asset that compounds without limit.';}document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;desc.textContent='✦ Stax Edge original quote generated';}else{MINT_STATE.quoteText='Intelligence is the only asset that compounds without limit.';document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;desc.textContent='✦ Stax Edge original quote';}}
 
 /* ============================================================
-   THEME
+   WALLETS
    ============================================================ */
-function setThemeLabel() {
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.getElementById('theme-label').textContent = isDark ? 'Dark' : 'Light';
-}
-function toggleTheme() {
-  const html = document.documentElement;
-  const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', newTheme);
-  setThemeLabel();
-  try {
-    const s = JSON.parse(localStorage.getItem('dbsignal_v2') || '{}');
-    s.theme = newTheme;
-    localStorage.setItem('dbsignal_v2', JSON.stringify(s));
-  } catch(e) {}
-}
+function connectWalletToMint(){if(walletState.connected){executeMint();return;}document.getElementById('wallet-install-notice').classList.remove('show');openWalletSelector();}
+function openWalletSelector(){document.getElementById('wallet-selector-overlay').classList.add('open');}
+function closeWalletSelector(){document.getElementById('wallet-selector-overlay').classList.remove('open');}
 
-/* ============================================================
-   ADMIN — UNLOCK
-   ============================================================ */
-document.getElementById('logo-trigger').addEventListener('click', () => {
-  STATE.unlockCount++;
-  if (STATE.unlockCount >= 5) { STATE.unlockCount = 0; openAdmin(); }
-});
-
-function openAdmin() {
-  document.getElementById('api-key-input').value = STATE.apiKey;
-  document.getElementById('wl-title').value       = STATE.wlTitle;
-  document.getElementById('wl-sub').value          = STATE.wlSub;
-  document.getElementById('wl-tag').value           = STATE.wlTag;
-  syncModeUI();
-  renderFeedList();
-  clearStatuses();
-  document.getElementById('admin-overlay').classList.add('open');
-}
-function closeAdmin() {
-  document.getElementById('admin-overlay').classList.remove('open');
-}
-document.getElementById('admin-overlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('admin-overlay')) closeAdmin();
-});
-
-/* ============================================================
-   TABS
-   ============================================================ */
-function switchTab(name, btn) {
-  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('tab-' + name).classList.add('active');
-}
-function clearStatuses() {
-  ['status-mode','status-feeds','status-label','status-api'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) { el.textContent = ''; el.className = 'admin-status'; }
-  });
-}
-function setStatus(id, msg, type) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = msg;
-  el.className = 'admin-status ' + (type || '');
-}
-
-/* ============================================================
-   MODE
-   ============================================================ */
-function toggleMode() {
-  STATE.mode = STATE.mode === 'beards' ? 'edge' : 'beards';
-  syncModeUI();
-}
-function syncModeUI() {
-  const isEdge = STATE.mode === 'edge';
-  document.getElementById('mode-big-toggle').classList.toggle('on', isEdge);
-  document.getElementById('mode-name').textContent = isEdge ? 'Stax Edge (Active)' : 'Beards Doctrine (Default)';
-  document.getElementById('mode-desc').textContent = isEdge
-    ? 'Claude rewrites in sharp CEO-ready voice. Source still credited.'
-    : 'AI summary + source link. Fully Beards Doctrine compliant.';
-  document.getElementById('mode-pill').style.display = isEdge ? 'flex' : 'none';
-}
-
-/* ============================================================
-   FEED MANAGER UI
-   ============================================================ */
-function renderFeedList() {
-  const list = document.getElementById('feed-list');
-  document.getElementById('feed-count').textContent = STATE.feeds.length;
-  if (!STATE.feeds.length) {
-    list.innerHTML = `<div class="feed-empty">No feeds added yet. Add one below.</div>`;
-    return;
-  }
-  list.innerHTML = STATE.feeds.map((f, i) => `
-    <div class="feed-item">
-      <div class="feed-item-source">${escHTML(f.source)}</div>
-      <div class="feed-item-url" title="${escHTML(f.url)}">${escHTML(f.url)}</div>
-      <div class="feed-item-cat">${escHTML(CAT_LABELS[f.cat] || f.cat)}</div>
-      <button class="feed-remove" onclick="removeFeed(${i})" title="Remove">✕</button>
-    </div>
-  `).join('');
-}
-
-function addFeed() {
-  const url    = document.getElementById('new-feed-url').value.trim();
-  const source = document.getElementById('new-feed-source').value.trim();
-  const cat    = document.getElementById('new-feed-cat').value;
-  if (!url || !source) { setStatus('status-feeds', '⚠ Enter both a URL and a source name.', 'err'); return; }
-  try { new URL(url); } catch { setStatus('status-feeds', '⚠ That URL does not look valid.', 'err'); return; }
-  if (STATE.feeds.find(f => f.url === url)) { setStatus('status-feeds', '⚠ That feed is already in your list.', 'err'); return; }
-  STATE.feeds.push({ url, source, cat });
-  document.getElementById('new-feed-url').value    = '';
-  document.getElementById('new-feed-source').value = '';
-  document.getElementById('master-feed-select').value = '';
-  renderFeedList();
-  setStatus('status-feeds', `✓ ${source} added.`, 'ok');
-}
-
-function removeFeed(idx) {
-  const removed = STATE.feeds.splice(idx, 1);
-  renderFeedList();
-  setStatus('status-feeds', `Removed: ${removed[0].source}`, '');
-}
-
-function resetFeeds() {
-  if (!confirm('Reset to the default LLM feed list? Your custom feeds will be removed.')) return;
-  STATE.feeds = JSON.parse(JSON.stringify(DEFAULT_FEEDS));
-  renderFeedList();
-  setStatus('status-feeds', '✓ Reset to defaults.', 'ok');
-}
-
-/* ============================================================
-   SAVE & APPLY
-   ============================================================ */
-function saveAndApply() {
-  const key   = document.getElementById('api-key-input').value.trim();
-  const wlT   = document.getElementById('wl-title').value.trim() || 'InformStax';
-  const wlS   = document.getElementById('wl-sub').value.trim()   || 'LLM';
-  const wlTag = document.getElementById('wl-tag').value.trim()   || 'LLM · AI · Machine Learning';
-  if (STATE.mode === 'edge' && !key) {
-    setStatus('status-mode', '⚠ Add a Claude API key to use Stax Edge.', 'err');
-    setStatus('status-api',  '⚠ Claude API key is required for Stax Edge.', 'err');
-    return;
-  }
-  STATE.apiKey = key; STATE.wlTitle = wlT; STATE.wlSub = wlS; STATE.wlTag = wlTag;
-  persistState();
-  applyWhiteLabel();
-  ['status-mode','status-feeds','status-label','status-api'].forEach(id => setStatus(id, '✓ Saved.', 'ok'));
-  setTimeout(() => { closeAdmin(); loadAllFeeds(); }, 700);
-}
-
-function applyWhiteLabel() {
-  document.getElementById('topic-label').textContent = STATE.wlTitle + ' — ' + STATE.wlTag;
-  document.getElementById('nav-sub').textContent     = STATE.wlSub;
-  document.title = STATE.wlTitle + ' — LLM Intelligence';
-}
-
-/* ============================================================
-   CATEGORIES
-   ============================================================ */
-document.getElementById('categories').addEventListener('click', e => {
-  const cat = e.target.dataset.cat;
-  if (!cat) return;
-  STATE.currentCat = cat;
-  document.querySelectorAll('.cat').forEach(el => el.classList.toggle('active', el.dataset.cat === cat));
-  renderCards(STATE.articles);
-});
-
-/* ============================================================
-   RSS FETCHING
-   ============================================================ */
-async function fetchFeed(feed) {
-  try {
-    const res  = await fetch(ALLORIGINS + encodeURIComponent(feed.url));
-    const data = await res.json();
-    if (data && data.contents) {
-      const items = parseRSSXML(data.contents, feed);
-      if (items.length) return items;
-    }
-  } catch {}
-  try {
-    const res  = await fetch(RSS2JSON + encodeURIComponent(feed.url) + '&count=3');
-    const data = await res.json();
-    if (data.status === 'ok') {
-      return data.items.map(item => ({
-        title:     item.title || '',
-        link:      item.link  || item.guid || '#',
-        summary:   stripHTML(item.description || item.content || '').slice(0,420),
-        date:      item.pubDate ? new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '',
-        source:    feed.source, cat: feed.cat,
-        rewritten: null, rewriting: false,
-      }));
-    }
-  } catch {}
-  return [];
-}
-
-function parseRSSXML(xmlStr, feed) {
-  try {
-    const doc   = new DOMParser().parseFromString(xmlStr, 'text/xml');
-    const items = Array.from(doc.querySelectorAll('item, entry')).slice(0, 3);
-    return items.map(item => {
-      const get  = tag => item.querySelector(tag)?.textContent?.trim() || '';
-      const link = get('link') || item.querySelector('link')?.getAttribute('href') || '#';
-      const desc = get('description') || get('summary') || get('content') || '';
-      const pub  = get('pubDate') || get('published') || get('updated') || '';
-      return {
-        title: get('title'), link,
-        summary:   stripHTML(desc).slice(0,420),
-        date:      pub ? new Date(pub).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '',
-        source:    feed.source, cat: feed.cat,
-        rewritten: null, rewriting: false,
-      };
-    }).filter(a => a.title);
-  } catch { return []; }
-}
-
-function stripHTML(html) { return html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(); }
-function escHTML(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-async function loadAllFeeds() {
-  renderSkeletons();
-  const results = await Promise.allSettled(STATE.feeds.map(fetchFeed));
-  let articles = [];
-  results.forEach(r => { if (r.status === 'fulfilled') articles.push(...r.value); });
-  const seen = new Set();
-  articles = articles.filter(a => {
-    const k = a.title.toLowerCase().slice(0,60);
-    if (seen.has(k)) return false;
-    seen.add(k); return true;
-  });
-  articles.sort(() => Math.random() - 0.5);
-  STATE.articles = articles;
-  renderCards(articles);
-}
-
-/* ============================================================
-   SKELETONS
-   ============================================================ */
-function renderSkeletons() {
-  document.getElementById('feed').innerHTML = Array.from({length:6}).map(() => `
-    <div class="card">
-      <div class="card-header"><div class="skeleton short"></div><div class="skeleton" style="width:50px"></div></div>
-      <div class="card-body">
-        <div class="skeleton"></div><div class="skeleton"></div>
-        <div class="skeleton short"></div>
-        <div class="skeleton tall" style="margin-top:10px"></div>
-      </div>
-      <div class="card-footer"><div class="skeleton" style="width:60px"></div><div class="skeleton" style="width:80px"></div></div>
-    </div>`).join('');
-}
-
-/* ============================================================
-   RENDER CARDS
-   ============================================================ */
-function renderCards(articles) {
-  const feed = document.getElementById('feed');
-  const list = STATE.currentCat === 'all'
-    ? articles
-    : articles.filter(a => a.cat === STATE.currentCat);
-
-  if (!list.length) {
-    feed.innerHTML = `<div class="state-box"><div class="icon">📡</div><div>No articles found for this category.<br><small style="color:var(--faint)">Add feeds in Creator Settings (click logo 5×)</small></div></div>`;
-    return;
-  }
-  feed.innerHTML = list.map((a,i) => cardHTML(a,i)).join('');
-  if (STATE.mode === 'edge' && STATE.apiKey) {
-    list.forEach((a,i) => { if (!a.rewritten && !a.rewriting) rewriteArticle(a,i,list); });
-  }
-}
-
-function cardHTML(a, i) {
-  const isEdge  = STATE.mode === 'edge';
-  const modeTag = isEdge
-    ? `<span class="card-mode-tag tag-edge">Stax Edge</span>`
-    : `<span class="card-mode-tag tag-beards">Beards Doctrine</span>`;
-  const catLabel = CAT_LABELS[a.cat] || a.cat;
-  let body;
-  if (isEdge && a.rewriting) {
-    body = `<div class="rewriting"><div class="spin"></div> Rewriting in Stax Edge...</div>`;
-  } else if (isEdge && a.rewritten) {
-    body = formatEdgeContent(a.rewritten);
-  } else {
-    body = `<p>${escHTML(a.summary || 'Fetching summary…')}</p>`;
-  }
-  return `
-    <div class="card${isEdge?' mode2':''}" data-idx="${i}">
-      <div class="card-header">
-        <div class="card-source">
-          <div class="src-dot"></div>${escHTML(a.source)}
-          <span style="color:var(--faint);margin-left:4px;font-size:.6rem">${escHTML(catLabel)}</span>
-        </div>
-        ${modeTag}
-      </div>
-      <div class="card-body">
-        <div class="card-title">${escHTML(a.title)}</div>
-        <div class="card-summary">${body}</div>
-      </div>
-      <div class="card-footer">
-        <div class="card-date">${escHTML(a.date)}</div>
-        <button class="mint-btn" onclick="openMintModal(${i})"><span class="hex">✦</span> Mint</button>
-      </div>
-    </div>`;
-}
-
-function formatEdgeContent(text) {
-  const blMatch = text.match(/bottom line[:\s]*(.*)/i);
-  if (blMatch) {
-    const before = text.substring(0, text.search(/bottom line/i)).trim();
-    const bl     = blMatch[1].trim();
-    return `<p>${escHTML(before).replace(/\n+/g,'</p><p>')}</p>
-      <div class="bottom-line">Bottom Line: <span>${escHTML(bl)}</span></div>`;
-  }
-  return `<p>${escHTML(text).replace(/\n+/g,'</p><p>')}</p>`;
-}
-
-/* ============================================================
-   CLAUDE REWRITE — STAX EDGE
-   ============================================================ */
-const STAX_EDGE_SYSTEM = `You are the editorial voice for InformStax, a premium intelligence platform built for C-suite executives.
-
-Your job: rewrite news articles for busy technical CEOs who have zero tolerance for filler.
-
-VOICE RULES — follow every one:
-- First sentence gets straight to the point. No warm-up phrases whatsoever.
-- Paragraphs are 2 to 3 sentences maximum. No exceptions.
-- Active voice throughout. Eliminate passive constructions.
-- Clear, confident, direct language. No corporate jargon. No buzzwords.
-- PG-13 maximum — professional edge, never inappropriate.
-- No profanity of any kind.
-- No crude analogies or low-brow comparisons.
-- Always explain what this means for the reader's business — not just what happened.
-- End with exactly this line: "Bottom Line: [one sharp, definitive sentence]"
-- Total output: under 380 words.
-- Do not include a headline or the source name — those are handled by the platform.`;
-
-async function rewriteArticle(article, idx, list) {
-  article.rewriting = true;
-  const cardEl = document.querySelector(`[data-idx="${idx}"]`);
-  if (cardEl) cardEl.querySelector('.card-summary').innerHTML = `<div class="rewriting"><div class="spin"></div> Rewriting in Stax Edge...</div>`;
-  const prompt = `Source: ${article.source}\nTitle: ${article.title}\nContent: ${article.summary}\n\nRewrite this for a technical CEO audience using the Stax Edge voice.`;
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key':STATE.apiKey,
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true',
-      },
-      body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:600, system:STAX_EDGE_SYSTEM, messages:[{role:'user',content:prompt}] }),
-    });
-    const data = await res.json();
-    article.rewritten = data.content?.[0]?.text || article.summary;
-  } catch { article.rewritten = article.summary; }
-  article.rewriting = false;
-  if (cardEl) {
-    cardEl.querySelector('.card-summary').innerHTML = formatEdgeContent(article.rewritten);
-    cardEl.classList.add('mode2');
-    const tag = cardEl.querySelector('.card-mode-tag');
-    if (tag) { tag.className = 'card-mode-tag tag-edge'; tag.textContent = 'Stax Edge'; }
-  }
-}
-
-/* ============================================================
-   MINT MODAL
-   ============================================================ */
-let MINT_STATE = { article:null, articleIdx:null, quoteOn:false, tier:'free', quoteText:'', generating:false };
-
-function openMintModal(idx) {
-  const list = STATE.currentCat === 'all' ? STATE.articles : STATE.articles.filter(a => a.cat === STATE.currentCat);
-  const article = list[idx];
-  if (!article) return;
-  MINT_STATE = { article, articleIdx:idx, quoteOn:false, tier:'free', quoteText:'', generating:false };
-  document.getElementById('nft-meta-title').textContent = article.title;
-  document.getElementById('quote-toggle').classList.remove('on');
-  document.getElementById('nft-quote-overlay').classList.remove('show');
-  document.getElementById('quote-desc').textContent = 'Add an original Stax Edge quote to your NFT';
-  selectTier('free');
-  document.getElementById('mint-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeMintModal() {
-  document.getElementById('mint-overlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function selectTier(tier) {
-  MINT_STATE.tier = tier;
-  document.getElementById('pill-free').className    = 'tier-pill' + (tier==='free'    ? ' active-free'    : '');
-  document.getElementById('pill-premium').className = 'tier-pill' + (tier==='premium' ? ' active-premium' : '');
-  const wm = document.getElementById('nft-watermark');
-  tier === 'free' ? wm.classList.add('show') : wm.classList.remove('show');
-  const badge = document.getElementById('nft-tier-badge');
-  if (tier === 'free') {
-    badge.textContent = 'Free'; badge.className = 'nft-meta-badge badge-free';
-    document.getElementById('tier-desc').textContent = 'Free includes informstax.com watermark';
-  } else {
-    badge.textContent = 'Premium'; badge.className = 'nft-meta-badge badge-premium';
-    document.getElementById('tier-desc').textContent = 'Premium NFT — clean, no watermark';
-  }
-}
-async function toggleMintQuote() {
-  const toggle = document.getElementById('quote-toggle');
-  MINT_STATE.quoteOn = !MINT_STATE.quoteOn;
-  toggle.classList.toggle('on', MINT_STATE.quoteOn);
-  const overlay = document.getElementById('nft-quote-overlay');
-  const desc    = document.getElementById('quote-desc');
-  if (!MINT_STATE.quoteOn) { overlay.classList.remove('show'); desc.textContent = 'Add an original Stax Edge quote to your NFT'; return; }
-  overlay.classList.add('show');
-  if (MINT_STATE.quoteText) { document.getElementById('nft-quote-text').textContent = `"${MINT_STATE.quoteText}"`; return; }
-  if (STATE.apiKey && MINT_STATE.article) {
-    desc.textContent = '✦ Generating Stax Edge quote…';
-    document.getElementById('nft-quote-text').textContent = '…';
-    try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json','x-api-key':STATE.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-        body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:80, messages:[{role:'user',content:`Based on this news topic: "${MINT_STATE.article.title}"\n\nWrite ONE sharp, original quote — 12 to 20 words maximum. No attribution. No quotation marks. No fluff. PG-13. Direct. CEO-level insight.`}] }),
-      });
-      const data = await res.json();
-      const quote = data.content?.[0]?.text?.trim() || 'Intelligence is the only asset that compounds without limit.';
-      MINT_STATE.quoteText = quote.replace(/^["']|["']$/g,'');
-      document.getElementById('nft-quote-text').textContent = `"${MINT_STATE.quoteText}"`;
-      desc.textContent = '✦ Stax Edge original quote generated';
-    } catch {
-      MINT_STATE.quoteText = 'Intelligence is the only asset that compounds without limit.';
-      document.getElementById('nft-quote-text').textContent = `"${MINT_STATE.quoteText}"`;
-      desc.textContent = '✦ Stax Edge original quote';
-    }
-  } else {
-    MINT_STATE.quoteText = 'Intelligence is the only asset that compounds without limit.';
-    document.getElementById('nft-quote-text').textContent = `"${MINT_STATE.quoteText}"`;
-    desc.textContent = '✦ Stax Edge original quote';
-  }
-}
-
-/* ============================================================
-   WALLET
-   ============================================================ */
-const WC_PROJECT_ID = '614e499dd10274d1b266be0c640c10c1';
-let walletState = { connected:false, accountId:null, provider:null };
-let appKit = null;
-
-async function initAppKit() {
-  if (appKit) return appKit;
-  try {
-    const { createAppKit } = await import('@reown/appkit');
-    appKit = createAppKit({
-      projectId:WC_PROJECT_ID, networks:[],
-      metadata:{ name:'InformStax', description:'Mint AI-curated news moments as NFTs on Hedera', url:'https://informstax.com', icons:['https://informstax.com/favicon.ico'] },
-      features:{ analytics:false },
-    });
-    appKit.subscribeEvents((event) => {
-      if (event.data.event === 'CONNECT_SUCCESS') { const addr = appKit.getAddress(); if (addr) onWalletConnected(addr.slice(0,6)+'…'+addr.slice(-4),'walletconnect'); }
-      if (event.data.event === 'DISCONNECT_SUCCESS') disconnectWallet();
-    });
-    return appKit;
-  } catch(err) { console.error('AppKit init failed:', err); throw err; }
-}
-
-function connectWalletToMint() { if (walletState.connected) { executeMint(); return; } openWalletSelector(); }
-function openWalletSelector()  { document.getElementById('wallet-selector-overlay').classList.add('open'); }
-function closeWalletSelector() { document.getElementById('wallet-selector-overlay').classList.remove('open'); }
-
-async function connectHashPack() {
+/* MetaMask — direct window.ethereum, no library needed */
+async function connectMetaMask(){
   closeWalletSelector();
-  const btn = document.getElementById('mint-connect-btn');
-  btn.textContent = 'Connecting to HashPack…'; btn.style.opacity = '0.7';
-  try { const kit = await initAppKit(); await kit.open({ view:'Connect' }); } catch(err) { showWalletError('HashPack connection failed.'); }
-  btn.textContent = 'Connect Wallet to Mint'; btn.style.opacity = '1';
+  if(!window.ethereum||!window.ethereum.isMetaMask){
+    const n=document.getElementById('wallet-install-notice');
+    document.getElementById('wallet-install-title').textContent='MetaMask not detected';
+    document.getElementById('wallet-install-link').textContent='Download MetaMask →';
+    document.getElementById('wallet-install-link').onclick=()=>window.open('https://metamask.io/download/','_blank');
+    n.classList.add('show');
+    return;
+  }
+  setMintBtn('busy','Connecting to MetaMask…');
+  try{
+    const accounts=await window.ethereum.request({method:'eth_requestAccounts'});
+    if(accounts&&accounts.length){
+      onWalletConnected(accounts[0].slice(0,6)+'…'+accounts[0].slice(-4),'metamask');
+      window.ethereum.on('accountsChanged',accs=>{if(!accs.length)disconnectWallet();else{const d=accs[0].slice(0,6)+'…'+accs[0].slice(-4);document.getElementById('wallet-connected-id').textContent=d;walletState.accountId=d;}});
+    }else{setMintBtn('idle','Connect Wallet to Mint');showMintErr('No accounts returned.');}
+  }catch(err){
+    if(err.code===4001)showMintErr('Connection cancelled.');
+    else showMintErr('MetaMask: '+(err.message||'unknown error'));
+    setMintBtn('idle','Connect Wallet to Mint');
+  }
 }
-async function connectWalletConnect() {
+
+/* HashPack — routes through WalletConnect v2 (HashPack supports WC natively) */
+async function connectHashPack(){
   closeWalletSelector();
-  const btn = document.getElementById('mint-connect-btn');
-  btn.textContent = 'Opening WalletConnect…'; btn.style.opacity = '0.7';
-  try { const kit = await initAppKit(); await kit.open({ view:'Connect' }); } catch(err) { showWalletError('WalletConnect failed.'); }
-  btn.textContent = 'Connect Wallet to Mint'; btn.style.opacity = '1';
-}
-function onWalletConnected(accountId, provider) {
-  walletState = { connected:true, accountId, provider };
-  document.getElementById('wallet-connected-id').textContent = accountId;
-  document.getElementById('wallet-connected-bar').classList.add('show');
-  const btn = document.getElementById('mint-connect-btn');
-  btn.textContent = '✦ Mint Now'; btn.style.background = '#5cb85c'; btn.style.color = '#fff';
-}
-function disconnectWallet() {
-  walletState = { connected:false, accountId:null, provider:null };
-  document.getElementById('wallet-connected-bar').classList.remove('show');
-  const btn = document.getElementById('mint-connect-btn');
-  btn.textContent = 'Connect Wallet to Mint'; btn.style.background = '#E8C547'; btn.style.color = '#080808';
-}
-function showWalletError(msg) {
-  const btn = document.getElementById('mint-connect-btn');
-  btn.textContent = '⚠ ' + msg; btn.style.background = '#1a1a1a'; btn.style.color = '#E8C547';
-  setTimeout(() => { btn.textContent = 'Connect Wallet to Mint'; btn.style.background = '#E8C547'; btn.style.color = '#080808'; }, 3500);
-}
-function executeMint() { showWalletError('Minting coming in next build!'); }
-
-/* ============================================================
-   INIT
-   ============================================================ */
-function init() {
-  loadState();
-  applyWhiteLabel();
-  syncModeUI();
-  setThemeLabel();
-  buildMasterDropdown();
-  loadAllFeeds();
-  document.getElementById('mint-overlay').addEventListener('click', e => { if (e.target === document.getElementById('mint-overlay')) closeMintModal(); });
-  document.getElementById('wallet-selector-overlay').addEventListener('click', e => { if (e.target === document.getElementById('wallet-selector-overlay')) closeWalletSelector(); });
+  setMintBtn('busy','Opening HashPack via WalletConnect…');
+  try{
+    const{WalletConnectModal}=await import('https://esm.sh/@walletconnect/modal@2.7.0');
+    const modal=new WalletConnectModal({
+      projectId:WC_PROJECT_ID,
+      chains:['hedera:mainnet'],
+      themeMode:'dark',
+      themeVariables:{'--wcm-accent-color':'#E8C547','--wcm-background-color':'#080808'},
+    });
+    modal.subscribeModal(state=>{if(!state.open)setMintBtn('idle','Connect Wallet to Mint');});
+    await modal.openModal();
+  }catch(err){
+    console.error('HashPack/WC error:',err);
+    showMintErr('HashPack connection failed. Try WalletConnect below.');
+    setMintBtn('idle','Connect Wallet to Mint');
+  }
 }
 
-// Expose all to global scope
-window.toggleTheme         = toggleTheme;
-window.toggleMode          = toggleMode;
-window.switchTab           = switchTab;
-window.saveAndApply        = saveAndApply;
-window.addFeed             = addFeed;
-window.removeFeed          = removeFeed;
-window.resetFeeds          = resetFeeds;
-window.closeAdmin          = closeAdmin;
-window.fillFromMaster      = fillFromMaster;
-window.openMintModal       = openMintModal;
-window.closeMintModal      = closeMintModal;
-window.toggleMintQuote     = toggleMintQuote;
-window.selectTier          = selectTier;
-window.connectWalletToMint = connectWalletToMint;
-window.closeWalletSelector = closeWalletSelector;
-window.connectHashPack     = connectHashPack;
-window.connectWalletConnect= connectWalletConnect;
-window.disconnectWallet    = disconnectWallet;
+/* WalletConnect — all other wallets via QR */
+async function connectWalletConnect(){
+  closeWalletSelector();
+  setMintBtn('busy','Loading WalletConnect…');
+  try{
+    const{WalletConnectModal}=await import('https://esm.sh/@walletconnect/modal@2.7.0');
+    const modal=new WalletConnectModal({
+      projectId:WC_PROJECT_ID,
+      chains:['eip155:1'],
+      themeMode:'dark',
+      themeVariables:{'--wcm-accent-color':'#E8C547','--wcm-background-color':'#080808'},
+    });
+    modal.subscribeModal(state=>{if(!state.open)setMintBtn('idle','Connect Wallet to Mint');});
+    await modal.openModal();
+  }catch(err){
+    console.error('WalletConnect error:',err);
+    showMintErr('WalletConnect failed. Try MetaMask instead.');
+    setMintBtn('idle','Connect Wallet to Mint');
+  }
+}
+
+function onWalletConnected(accountId,provider){walletState={connected:true,accountId,provider};document.getElementById('wallet-connected-id').textContent=accountId;document.getElementById('wallet-connected-bar').classList.add('show');setMintBtn('ready','✦ Mint Now');}
+function disconnectWallet(){walletState={connected:false,accountId:null,provider:null};document.getElementById('wallet-connected-bar').classList.remove('show');setMintBtn('idle','Connect Wallet to Mint');}
+function setMintBtn(state,label){const btn=document.getElementById('mint-connect-btn');btn.textContent=label;if(state==='ready'){btn.style.background='#5cb85c';btn.style.color='#fff';}else if(state==='busy'){btn.style.background='#1a1a1a';btn.style.color='#E8C547';}else{btn.style.background='#E8C547';btn.style.color='#080808';}}
+function showMintErr(msg){const btn=document.getElementById('mint-connect-btn');btn.textContent='⚠ '+msg;btn.style.background='#1a0000';btn.style.color='#ff6b6b';setTimeout(()=>{btn.textContent=walletState.connected?'✦ Mint Now':'Connect Wallet to Mint';btn.style.background=walletState.connected?'#5cb85c':'#E8C547';btn.style.color=walletState.connected?'#fff':'#080808';},4000);}
+function executeMint(){showMintErr('Minting coming in next build!');}
+
+function init(){
+  loadState();applyWhiteLabel();syncModeUI();setThemeLabel();buildMasterDropdown();loadAllFeeds();
+  document.getElementById('mint-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('mint-overlay'))closeMintModal();});
+  document.getElementById('wallet-selector-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('wallet-selector-overlay'))closeWalletSelector();});
+}
+
+window.toggleTheme=toggleTheme;window.toggleMode=toggleMode;window.switchTab=switchTab;
+window.saveAndApply=saveAndApply;window.addFeed=addFeed;window.removeFeed=removeFeed;
+window.resetFeeds=resetFeeds;window.closeAdmin=closeAdmin;window.fillFromMaster=fillFromMaster;
+window.openMintModal=openMintModal;window.closeMintModal=closeMintModal;
+window.toggleMintQuote=toggleMintQuote;window.selectTier=selectTier;
+window.connectWalletToMint=connectWalletToMint;window.closeWalletSelector=closeWalletSelector;
+window.connectMetaMask=connectMetaMask;window.connectHashPack=connectHashPack;
+window.connectWalletConnect=connectWalletConnect;window.disconnectWallet=disconnectWallet;
 
 init();
 </script>
