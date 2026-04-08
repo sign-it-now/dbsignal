@@ -226,20 +226,7 @@ a{text-decoration:none}
   </div>
 </div>
 
-<div class="categories" id="categories">
-  <div class="cat active" data-cat="all">All</div>
-  <div class="cat" data-cat="ai-llm">🤖 AI / LLM</div>
-  <div class="cat" data-cat="tech">💻 Tech</div>
-  <div class="cat" data-cat="cloud">☁️ Cloud</div>
-  <div class="cat" data-cat="blockchain">⛓️ Blockchain</div>
-  <div class="cat" data-cat="science">🔬 Science</div>
-  <div class="cat" data-cat="biology">🧬 Biology</div>
-  <div class="cat" data-cat="math">➗ Math</div>
-  <div class="cat" data-cat="health">💊 Health</div>
-  <div class="cat" data-cat="engineering">⚙️ Engineering</div>
-  <div class="cat" data-cat="business">👔 Business</div>
-  <div class="cat" data-cat="space">🛸 Space</div>
-</div>
+<div class="categories" id="categories"></div>
 
 <main class="feed" id="feed"></main>
 
@@ -594,9 +581,9 @@ function toggleMode(){STATE.mode=STATE.mode==='beards'?'edge':'beards';syncModeU
 function syncModeUI(){const isEdge=STATE.mode==='edge';document.getElementById('mode-big-toggle').classList.toggle('on',isEdge);document.getElementById('mode-name').textContent=isEdge?'Stax Edge (Active)':'Beards Doctrine (Default)';document.getElementById('mode-desc').textContent=isEdge?'Claude rewrites in sharp CEO voice. Source link always visible.':'AI summary + source link. Fully compliant.';document.getElementById('mode-pill').style.display=isEdge?'flex':'none';}
 
 function renderFeedList(){const list=document.getElementById('feed-list');document.getElementById('feed-count').textContent=STATE.feeds.length;if(!STATE.feeds.length){list.innerHTML=`<div class="feed-empty">No feeds. Add one below.</div>`;return;}list.innerHTML=STATE.feeds.map((f,i)=>`<div class="feed-item"><div class="feed-item-source">${escHTML(f.source)}</div><div class="feed-item-url" title="${escHTML(f.url)}">${escHTML(f.url)}</div><div class="feed-item-cat">${escHTML(CAT_LABELS[f.cat]||f.cat)}</div><button class="feed-remove" onclick="removeFeed(${i})">✕</button></div>`).join('');}
-function addFeed(){const url=document.getElementById('new-feed-url').value.trim();const source=document.getElementById('new-feed-source').value.trim();const cat=document.getElementById('new-feed-cat').value;if(!url||!source){setStatus('status-feeds','⚠ Enter both URL and source name.','err');return;}try{new URL(url);}catch{setStatus('status-feeds','⚠ URL not valid.','err');return;}if(STATE.feeds.find(f=>f.url===url)){setStatus('status-feeds','⚠ Feed already in list.','err');return;}STATE.feeds.push({url,source,cat});document.getElementById('new-feed-url').value='';document.getElementById('new-feed-source').value='';document.getElementById('master-feed-select').value='';renderFeedList();setStatus('status-feeds',`✓ ${source} added.`,'ok');}
-function removeFeed(idx){const r=STATE.feeds.splice(idx,1);renderFeedList();setStatus('status-feeds',`Removed: ${r[0].source}`,'');}
-function resetFeeds(){if(!confirm('Reset to default feeds?'))return;STATE.feeds=JSON.parse(JSON.stringify(DEFAULT_FEEDS));renderFeedList();setStatus('status-feeds','✓ Reset to defaults.','ok');}
+function addFeed(){const url=document.getElementById('new-feed-url').value.trim();const source=document.getElementById('new-feed-source').value.trim();const cat=document.getElementById('new-feed-cat').value;if(!url||!source){setStatus('status-feeds','⚠ Enter both URL and source name.','err');return;}try{new URL(url);}catch{setStatus('status-feeds','⚠ URL not valid.','err');return;}if(STATE.feeds.find(f=>f.url===url)){setStatus('status-feeds','⚠ Feed already in list.','err');return;}STATE.feeds.push({url,source,cat});document.getElementById('new-feed-url').value='';document.getElementById('new-feed-source').value='';document.getElementById('master-feed-select').value='';renderFeedList();renderCategories();setStatus('status-feeds',`✓ ${source} added.`,'ok');}
+function removeFeed(idx){const r=STATE.feeds.splice(idx,1);renderFeedList();renderCategories();setStatus('status-feeds',`Removed: ${r[0].source}`,'');}
+function resetFeeds(){if(!confirm('Reset to default feeds?'))return;STATE.feeds=JSON.parse(JSON.stringify(DEFAULT_FEEDS));renderFeedList();renderCategories();setStatus('status-feeds','✓ Reset to defaults.','ok');}
 
 function saveAndApply(){
   const siteKey=document.getElementById('site-key-input').value.trim();
@@ -608,7 +595,7 @@ function saveAndApply(){
   STATE.siteKey=siteKey;STATE.apiKey=personalKey;STATE.wlTitle=wlT;STATE.wlSub=wlS;STATE.wlTag=wlTag;
   persistState();applyWhiteLabel();
   ['status-mode','status-feeds','status-label','status-api'].forEach(id=>setStatus(id,'✓ Saved.','ok'));
-  setTimeout(()=>{closeAdmin();loadAllFeeds();},700);
+  setTimeout(()=>{closeAdmin();renderCategories();loadAllFeeds();},700);
 }
 function applyWhiteLabel(){document.getElementById('topic-label').textContent=STATE.wlTitle+' — '+STATE.wlTag;document.getElementById('nav-sub').textContent=STATE.wlSub;document.title=STATE.wlTitle+' — LLM Intelligence';}
 
@@ -744,13 +731,28 @@ function setMintBtn(state,label){const btn=document.getElementById('mint-connect
 function showMintErr(msg){const btn=document.getElementById('mint-connect-btn');btn.textContent='⚠ '+msg;btn.style.background='#1a0000';btn.style.color='#ff6b6b';setTimeout(()=>{btn.textContent=walletState.connected?'✦ Mint Now':'Connect Wallet to Mint';btn.style.background=walletState.connected?'#5cb85c':'#E8C547';btn.style.color=walletState.connected?'#fff':'#080808';},4000);}
 function executeMint(){showMintErr('Minting coming in next build!');}
 
+function renderCategories(){
+  const wrap=document.getElementById('categories');
+  const activeCats=new Set(STATE.feeds.map(f=>f.cat));
+  const current=STATE.currentCat;
+  wrap.innerHTML='<div class="cat '+(current==='all'?'active':'')+'" data-cat="all">All</div>';
+  Object.keys(CAT_LABELS).forEach(cat=>{
+    if(!activeCats.has(cat))return;
+    const div=document.createElement('div');
+    div.className='cat'+(current===cat?' active':'');
+    div.dataset.cat=cat;
+    div.textContent=CAT_LABELS[cat];
+    wrap.appendChild(div);
+  });
+}
+
 function init(){
-  loadState();applyWhiteLabel();syncModeUI();setThemeLabel();buildMasterDropdown();loadAllFeeds();
+  loadState();applyWhiteLabel();syncModeUI();setThemeLabel();buildMasterDropdown();renderCategories();loadAllFeeds();
   document.getElementById('mint-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('mint-overlay'))closeMintModal();});
   document.getElementById('wallet-selector-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('wallet-selector-overlay'))closeWalletSelector();});
 }
 
-window.toggleTheme=toggleTheme;window.toggleMode=toggleMode;window.switchTab=switchTab;
+window.renderCategories=renderCategories;window.toggleTheme=toggleTheme;window.toggleMode=toggleMode;window.switchTab=switchTab;
 window.saveAndApply=saveAndApply;window.addFeed=addFeed;window.removeFeed=removeFeed;
 window.resetFeeds=resetFeeds;window.closeAdmin=closeAdmin;window.fillFromMaster=fillFromMaster;
 window.openMintModal=openMintModal;window.closeMintModal=closeMintModal;
