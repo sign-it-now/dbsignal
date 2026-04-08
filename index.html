@@ -140,8 +140,8 @@ a{text-decoration:none}
 .mint-close{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .2s}
 .mint-close:hover{background:#1c1c1c}
 .nft-preview{border-radius:12px;overflow:hidden;border:1px solid #252525;margin-bottom:1.2rem;background:#080808;position:relative}
-.nft-image-area{width:100%;aspect-ratio:1/1;position:relative;overflow:hidden;background:#080808}
-
+.nft-image-area{width:100%;aspect-ratio:1/1;background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#0f0f0f 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;position:relative;overflow:hidden}
+.nft-image-area::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(232,197,71,0.04) 0%,transparent 70%)}
 .nft-logo-large{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;letter-spacing:-.02em;color:#333}
 .nft-logo-large span{color:rgba(232,197,71,0.3)}
 .nft-placeholder-label{font-size:.65rem;color:#333;letter-spacing:.1em;text-transform:uppercase}
@@ -208,7 +208,7 @@ a{text-decoration:none}
 <body>
 
 <nav class="nav">
-  <div class="logo" id="logo-trigger" title="Click 5× for creator settings">INFORM<span>STAX</span><sub id="nav-sub">.com</sub></div>
+  <div class="logo" id="logo-trigger" title="Click 5× for creator settings">INFORM<span>STAX</span><sub id="nav-sub">LLM</sub></div>
   <div class="nav-center" id="topic-label">InformStax — LLM Intelligence</div>
   <div class="nav-right">
     <div class="mode-pill" id="mode-pill"><div class="dot"></div><span>Stax Edge</span></div>
@@ -226,7 +226,20 @@ a{text-decoration:none}
   </div>
 </div>
 
-<div class="categories" id="categories"></div>
+<div class="categories" id="categories">
+  <div class="cat active" data-cat="all">All</div>
+  <div class="cat" data-cat="ai-llm">🤖 AI / LLM</div>
+  <div class="cat" data-cat="tech">💻 Tech</div>
+  <div class="cat" data-cat="cloud">☁️ Cloud</div>
+  <div class="cat" data-cat="blockchain">⛓️ Blockchain</div>
+  <div class="cat" data-cat="science">🔬 Science</div>
+  <div class="cat" data-cat="biology">🧬 Biology</div>
+  <div class="cat" data-cat="math">➗ Math</div>
+  <div class="cat" data-cat="health">💊 Health</div>
+  <div class="cat" data-cat="engineering">⚙️ Engineering</div>
+  <div class="cat" data-cat="business">👔 Business</div>
+  <div class="cat" data-cat="space">🛸 Space</div>
+</div>
 
 <main class="feed" id="feed"></main>
 
@@ -327,12 +340,13 @@ a{text-decoration:none}
     <div class="mint-header"><div class="mint-title">✦ Mint This Moment</div><button class="mint-close" onclick="closeMintModal()">✕</button></div>
     <div class="nft-preview">
       <div class="nft-image-area">
-        <canvas id="nft-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%;display:block"></canvas>
-        <div class="nft-quote-overlay" id="nft-quote-overlay" style="z-index:2">
+        <div class="nft-logo-large">INFORM<span>STAX</span></div>
+        <div class="nft-placeholder-label">Image Coming Soon</div>
+        <div class="nft-quote-overlay" id="nft-quote-overlay">
           <div class="nft-quote-text" id="nft-quote-text">"The future belongs to those who act on intelligence, not just consume it."</div>
           <div style="display:flex;align-items:center;gap:6px;font-size:.62rem;color:rgba(232,197,71,0.5);text-transform:uppercase;letter-spacing:.06em;margin-top:.4rem;justify-content:center">✦ Stax Edge Original</div>
         </div>
-        <div class="nft-watermark" id="nft-watermark" style="z-index:2">informstax.com</div>
+        <div class="nft-watermark" id="nft-watermark">informstax.com</div>
       </div>
       <div class="nft-meta"><div class="nft-meta-title" id="nft-meta-title">Article Title</div><div class="nft-meta-badge badge-free" id="nft-tier-badge">Free</div></div>
     </div>
@@ -533,7 +547,7 @@ function loadState(){
     if(s.apiKey)STATE.apiKey=s.apiKey;
     if(s.siteKey)STATE.siteKey=s.siteKey;
     STATE.wlTitle=s.wlTitle||'InformStax';
-    STATE.wlSub=s.wlSub||'.com';
+    STATE.wlSub=(s.wlSub&&s.wlSub!=='LLM')?s.wlSub:'.com';
     STATE.wlTag=s.wlTag||'LLM · AI · Machine Learning';
     if(s.feeds&&s.feeds.length)STATE.feeds=s.feeds;
   }catch(e){}
@@ -580,21 +594,21 @@ function toggleMode(){STATE.mode=STATE.mode==='beards'?'edge':'beards';syncModeU
 function syncModeUI(){const isEdge=STATE.mode==='edge';document.getElementById('mode-big-toggle').classList.toggle('on',isEdge);document.getElementById('mode-name').textContent=isEdge?'Stax Edge (Active)':'Beards Doctrine (Default)';document.getElementById('mode-desc').textContent=isEdge?'Claude rewrites in sharp CEO voice. Source link always visible.':'AI summary + source link. Fully compliant.';document.getElementById('mode-pill').style.display=isEdge?'flex':'none';}
 
 function renderFeedList(){const list=document.getElementById('feed-list');document.getElementById('feed-count').textContent=STATE.feeds.length;if(!STATE.feeds.length){list.innerHTML=`<div class="feed-empty">No feeds. Add one below.</div>`;return;}list.innerHTML=STATE.feeds.map((f,i)=>`<div class="feed-item"><div class="feed-item-source">${escHTML(f.source)}</div><div class="feed-item-url" title="${escHTML(f.url)}">${escHTML(f.url)}</div><div class="feed-item-cat">${escHTML(CAT_LABELS[f.cat]||f.cat)}</div><button class="feed-remove" onclick="removeFeed(${i})">✕</button></div>`).join('');}
-function addFeed(){const url=document.getElementById('new-feed-url').value.trim();const source=document.getElementById('new-feed-source').value.trim();const cat=document.getElementById('new-feed-cat').value;if(!url||!source){setStatus('status-feeds','⚠ Enter both URL and source name.','err');return;}try{new URL(url);}catch{setStatus('status-feeds','⚠ URL not valid.','err');return;}if(STATE.feeds.find(f=>f.url===url)){setStatus('status-feeds','⚠ Feed already in list.','err');return;}STATE.feeds.push({url,source,cat});document.getElementById('new-feed-url').value='';document.getElementById('new-feed-source').value='';document.getElementById('master-feed-select').value='';renderFeedList();renderCategories();setStatus('status-feeds',`✓ ${source} added.`,'ok');}
-function removeFeed(idx){const r=STATE.feeds.splice(idx,1);renderFeedList();renderCategories();setStatus('status-feeds',`Removed: ${r[0].source}`,'');}
-function resetFeeds(){if(!confirm('Reset to default feeds?'))return;STATE.feeds=JSON.parse(JSON.stringify(DEFAULT_FEEDS));renderFeedList();renderCategories();setStatus('status-feeds','✓ Reset to defaults.','ok');}
+function addFeed(){const url=document.getElementById('new-feed-url').value.trim();const source=document.getElementById('new-feed-source').value.trim();const cat=document.getElementById('new-feed-cat').value;if(!url||!source){setStatus('status-feeds','⚠ Enter both URL and source name.','err');return;}try{new URL(url);}catch{setStatus('status-feeds','⚠ URL not valid.','err');return;}if(STATE.feeds.find(f=>f.url===url)){setStatus('status-feeds','⚠ Feed already in list.','err');return;}STATE.feeds.push({url,source,cat});document.getElementById('new-feed-url').value='';document.getElementById('new-feed-source').value='';document.getElementById('master-feed-select').value='';renderFeedList();setStatus('status-feeds',`✓ ${source} added.`,'ok');}
+function removeFeed(idx){const r=STATE.feeds.splice(idx,1);renderFeedList();setStatus('status-feeds',`Removed: ${r[0].source}`,'');}
+function resetFeeds(){if(!confirm('Reset to default feeds?'))return;STATE.feeds=JSON.parse(JSON.stringify(DEFAULT_FEEDS));renderFeedList();setStatus('status-feeds','✓ Reset to defaults.','ok');}
 
 function saveAndApply(){
   const siteKey=document.getElementById('site-key-input').value.trim();
   const personalKey=document.getElementById('api-key-input').value.trim();
   const wlT=document.getElementById('wl-title').value.trim()||'InformStax';
-  const wlS=document.getElementById('wl-sub').value.trim()||'.com';
+  const wlS=document.getElementById('wl-sub').value.trim()||'LLM';
   const wlTag=document.getElementById('wl-tag').value.trim()||'LLM · AI · Machine Learning';
   if(STATE.mode==='edge'&&!siteKey&&!personalKey){setStatus('status-mode','⚠ Set a Site Key or Personal Key to use Stax Edge.','err');return;}
   STATE.siteKey=siteKey;STATE.apiKey=personalKey;STATE.wlTitle=wlT;STATE.wlSub=wlS;STATE.wlTag=wlTag;
   persistState();applyWhiteLabel();
   ['status-mode','status-feeds','status-label','status-api'].forEach(id=>setStatus(id,'✓ Saved.','ok'));
-  setTimeout(()=>{closeAdmin();renderCategories();try{localStorage.removeItem(CACHE_KEY);}catch{}loadAllFeeds();},700);
+  setTimeout(()=>{closeAdmin();renderCategories();try{localStorage.removeItem('dbsignal_articles_v1');localStorage.removeItem('dbsignal_articles_v2');}catch{}loadAllFeeds();},700);
 }
 function applyWhiteLabel(){document.getElementById('topic-label').textContent=STATE.wlTitle+' — '+STATE.wlTag;document.getElementById('nav-sub').textContent=STATE.wlSub;document.title=STATE.wlTitle+' — LLM Intelligence';}
 
@@ -622,7 +636,32 @@ function decodeEntities(str){const txt=document.createElement('textarea');txt.in
 function stripHTML(html){return html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();}
 function escHTML(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-async function loadAllFeeds(){renderSkeletons();const results=await Promise.allSettled(STATE.feeds.map(fetchFeed));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);STATE.articles=articles;renderCards(articles);}
+const CACHE_KEY='dbsignal_articles_v2';
+const CACHE_TTL=20*60*1000;
+const CORSFLARE='https://corsproxy.io/?';
+
+function getCachedArticles(){try{const raw=localStorage.getItem(CACHE_KEY);if(!raw)return null;const{ts,articles}=JSON.parse(raw);if(Date.now()-ts>CACHE_TTL)return null;return articles;}catch{return null;}}
+function setCachedArticles(articles){try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),articles}));}catch{}}
+
+async function loadAllFeeds(){
+  const cached=getCachedArticles();
+  if(cached&&cached.length){STATE.articles=cached;renderCards(cached);refreshInBackground();return;}
+  renderSkeletons();const results=await Promise.allSettled(STATE.feeds.map(fetchFeedMulti));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);if(articles.length)setCachedArticles(articles);STATE.articles=articles;renderCards(articles);}
+async function refreshInBackground(){try{const results=await Promise.allSettled(STATE.feeds.map(fetchFeedMulti));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);if(articles.length){setCachedArticles(articles);STATE.articles=articles;renderCards(articles);}}catch{}}
+async function fetchFeedMulti(feed){
+  const proxies=[ALLORIGINS,CORSFLARE];
+  for(const proxy of proxies){
+    try{
+      const res=await fetch(proxy+encodeURIComponent(feed.url),{signal:AbortSignal.timeout(8000)});
+      const text=await res.text();
+      let contents=text;
+      try{const j=JSON.parse(text);if(j.contents)contents=j.contents;}catch{}
+      const items=parseRSSXML(contents,feed);if(items.length)return items;
+    }catch{}
+  }
+  try{const res=await fetch(RSS2JSON+encodeURIComponent(feed.url)+'&count=3',{signal:AbortSignal.timeout(8000)});const data=await res.json();if(data.status==='ok')return data.items.map(item=>({title:decodeEntities(item.title||''),link:item.link||item.guid||'#',summary:decodeEntities(stripHTML(item.description||item.content||'')).slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
+  return[];
+}
 function renderSkeletons(){document.getElementById('feed').innerHTML=Array.from({length:6}).map(()=>`<div class="card"><div class="card-header"><div class="skeleton short"></div><div class="skeleton" style="width:50px"></div></div><div class="card-body"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton short"></div><div class="skeleton tall" style="margin-top:10px"></div></div><div class="card-footer"><div class="skeleton" style="width:60px"></div><div class="skeleton" style="width:80px"></div></div></div>`).join('');}
 function renderCards(articles){const feed=document.getElementById('feed');const list=STATE.currentCat==='all'?articles:articles.filter(a=>a.cat===STATE.currentCat);if(!list.length){feed.innerHTML=`<div class="state-box"><div class="icon">📡</div><div>No articles for this category.<br><small style="color:var(--faint)">Add feeds via Creator Settings (click logo 5×)</small></div></div>`;return;}feed.innerHTML=list.map((a,i)=>cardHTML(a,i)).join('');if(STATE.mode==='edge'&&getActiveKey())list.forEach((a,i)=>{if(!a.rewritten&&!a.rewriting)rewriteArticle(a,i,list);});}
 
@@ -669,7 +708,7 @@ const STAX_SYS=`You are the editorial voice for InformStax, a premium intelligen
 async function rewriteArticle(article,idx,list){article.rewriting=true;const cardEl=document.querySelector(`[data-idx="${idx}"]`);if(cardEl)cardEl.querySelector('.card-summary').innerHTML=`<div class="rewriting"><div class="spin"></div> Rewriting in Stax Edge...</div>`;try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getActiveKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:STAX_SYS,messages:[{role:'user',content:`Source: ${article.source}\nTitle: ${article.title}\nContent: ${article.summary}`}]})});const data=await res.json();article.rewritten=data.content?.[0]?.text||article.summary;}catch{article.rewritten=article.summary;}article.rewriting=false;if(cardEl){cardEl.querySelector('.card-summary').innerHTML=formatEdgeContent(article.rewritten);cardEl.classList.add('mode2');const tag=cardEl.querySelector('.card-mode-tag');if(tag){tag.className='card-mode-tag tag-edge';tag.textContent='Stax Edge';}}}
 
 let MINT_STATE={article:null,quoteOn:false,tier:'free',quoteText:''};
-function openMintModal(idx){const list=STATE.currentCat==='all'?STATE.articles:STATE.articles.filter(a=>a.cat===STATE.currentCat);const article=list[idx];if(!article)return;MINT_STATE={article,quoteOn:false,tier:'free',quoteText:''};document.getElementById('nft-meta-title').textContent=article.title;document.getElementById('quote-toggle').classList.remove('on');document.getElementById('nft-quote-overlay').classList.remove('show');document.getElementById('quote-desc').textContent='Add an original Stax Edge quote to your NFT';document.getElementById('wallet-install-notice').classList.remove('show');selectTier('free');generateNFTArt(article);setTimeout(()=>generateNFTArt(article),250);document.getElementById('mint-overlay').classList.add('open');document.body.style.overflow='hidden';}
+function openMintModal(idx){const list=STATE.currentCat==='all'?STATE.articles:STATE.articles.filter(a=>a.cat===STATE.currentCat);const article=list[idx];if(!article)return;MINT_STATE={article,quoteOn:false,tier:'free',quoteText:''};document.getElementById('nft-meta-title').textContent=article.title;document.getElementById('quote-toggle').classList.remove('on');document.getElementById('nft-quote-overlay').classList.remove('show');document.getElementById('quote-desc').textContent='Add an original Stax Edge quote to your NFT';document.getElementById('wallet-install-notice').classList.remove('show');selectTier('free');document.getElementById('mint-overlay').classList.add('open');document.body.style.overflow='hidden';}
 function closeMintModal(){document.getElementById('mint-overlay').classList.remove('open');document.body.style.overflow='';}
 function selectTier(tier){MINT_STATE.tier=tier;document.getElementById('pill-free').className='tier-pill'+(tier==='free'?' active-free':'');document.getElementById('pill-premium').className='tier-pill'+(tier==='premium'?' active-premium':'');const wm=document.getElementById('nft-watermark');tier==='free'?wm.classList.add('show'):wm.classList.remove('show');const badge=document.getElementById('nft-tier-badge');if(tier==='free'){badge.textContent='Free';badge.className='nft-meta-badge badge-free';document.getElementById('tier-desc').textContent='Free includes informstax.com watermark';}else{badge.textContent='Premium';badge.className='nft-meta-badge badge-premium';document.getElementById('tier-desc').textContent='Premium NFT — clean, no watermark';}}
 async function toggleMintQuote(){const toggle=document.getElementById('quote-toggle');MINT_STATE.quoteOn=!MINT_STATE.quoteOn;toggle.classList.toggle('on',MINT_STATE.quoteOn);const overlay=document.getElementById('nft-quote-overlay');const desc=document.getElementById('quote-desc');if(!MINT_STATE.quoteOn){overlay.classList.remove('show');desc.textContent='Add an original Stax Edge quote to your NFT';return;}overlay.classList.add('show');if(MINT_STATE.quoteText){document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;return;}const key=getActiveKey();if(key&&MINT_STATE.article){desc.textContent='✦ Generating Stax Edge quote…';document.getElementById('nft-quote-text').textContent='…';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:80,messages:[{role:'user',content:`Based on: "${MINT_STATE.article.title}"\nWrite ONE sharp CEO-level quote, 12-20 words. No quotes, no attribution.`}]})});const data=await res.json();MINT_STATE.quoteText=(data.content?.[0]?.text?.trim()||'Intelligence is the only asset that compounds without limit.').replace(/^["']|["']$/g,'');}catch{MINT_STATE.quoteText='Intelligence is the only asset that compounds without limit.';}document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;desc.textContent='✦ Stax Edge original quote generated';}else{MINT_STATE.quoteText='Intelligence is the only asset that compounds without limit.';document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;desc.textContent='✦ Stax Edge original quote';}}
@@ -730,79 +769,13 @@ function setMintBtn(state,label){const btn=document.getElementById('mint-connect
 function showMintErr(msg){const btn=document.getElementById('mint-connect-btn');btn.textContent='⚠ '+msg;btn.style.background='#1a0000';btn.style.color='#ff6b6b';setTimeout(()=>{btn.textContent=walletState.connected?'✦ Mint Now':'Connect Wallet to Mint';btn.style.background=walletState.connected?'#5cb85c':'#E8C547';btn.style.color=walletState.connected?'#fff':'#080808';},4000);}
 function executeMint(){showMintErr('Minting coming in next build!');}
 
-
-/* ============================================================
-   OPTION C — GENERATIVE NFT ART ENGINE
-   ============================================================ */
-const CAT_PALETTES={
-  'ai-llm':{bg:'#040608',a1:'#E8C547',a2:'#c8a030',a3:'#ffe880'},
-  'tech':{bg:'#030510',a1:'#4da6ff',a2:'#0066cc',a3:'#80c8ff'},
-  'cloud':{bg:'#030a12',a1:'#38bdf8',a2:'#0284c7',a3:'#7dd3fc'},
-  'blockchain':{bg:'#08030f',a1:'#a78bfa',a2:'#7c3aed',a3:'#c4b5fd'},
-  'science':{bg:'#030f0e',a1:'#2dd4bf',a2:'#0d9488',a3:'#99f6e4'},
-  'biology':{bg:'#030a04',a1:'#4ade80',a2:'#16a34a',a3:'#86efac'},
-  'math':{bg:'#0f030f',a1:'#f472b6',a2:'#db2777',a3:'#fbcfe8'},
-  'health':{bg:'#100303',a1:'#f87171',a2:'#dc2626',a3:'#fca5a5'},
-  'engineering':{bg:'#100800',a1:'#fb923c',a2:'#ea580c',a3:'#fed7aa'},
-  'business':{bg:'#050510',a1:'#e2b96f',a2:'#c49a3c',a3:'#f5d98b'},
-  'space':{bg:'#02020f',a1:'#818cf8',a2:'#4f46e5',a3:'#c7d2fe'},
-};
-function hashCode(str){let h=0x811c9dc5;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=(h*0x01000193)>>>0;}return h;}
-function mulberry32(seed){let a=seed;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
-function hexToRgba(hex,alpha){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgba(${r},${g},${b},${alpha})`;}
-function drawHex(ctx,cx,cy,r,strokeCol,fillCol){ctx.beginPath();for(let i=0;i<6;i++){const angle=(Math.PI/3)*i-Math.PI/6,x=cx+r*Math.cos(angle),y=cy+r*Math.sin(angle);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.closePath();if(fillCol){ctx.fillStyle=fillCol;ctx.fill();}if(strokeCol){ctx.strokeStyle=strokeCol;ctx.lineWidth=1;ctx.stroke();}}
-function generateNFTArt(article){
-  const canvas=document.getElementById('nft-canvas');if(!canvas)return;
-  const ctx=canvas.getContext('2d');const W=400,H=400;canvas.width=W;canvas.height=H;
-  const pal=CAT_PALETTES[article.cat]||CAT_PALETTES['ai-llm'];
-  const seed=hashCode(article.title||'informstax');const rng=mulberry32(seed);
-  const bgGrad=ctx.createLinearGradient(0,0,W,H);bgGrad.addColorStop(0,pal.bg);bgGrad.addColorStop(1,'#080808');
-  ctx.fillStyle=bgGrad;ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='rgba(255,255,255,0.035)';
-  for(let x=20;x<W;x+=28)for(let y=20;y<H;y+=28){ctx.beginPath();ctx.arc(x,y,1,0,Math.PI*2);ctx.fill();}
-  for(let i=0;i<3;i++){const cx=rng()*W,cy=rng()*H,r=70+rng()*130,grd=ctx.createRadialGradient(cx,cy,0,cx,cy,r);grd.addColorStop(0,hexToRgba(pal.a2,0.12+rng()*0.08));grd.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=grd;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();}
-  for(let i=0;i<6;i++){const angle=rng()*Math.PI,cx=rng()*W,cy=rng()*H,len=80+rng()*220;ctx.strokeStyle=hexToRgba(pal.a1,0.10+rng()*0.08);ctx.lineWidth=0.6;ctx.beginPath();ctx.moveTo(cx-Math.cos(angle)*len,cy-Math.sin(angle)*len);ctx.lineTo(cx+Math.cos(angle)*len,cy+Math.sin(angle)*len);ctx.stroke();}
-  drawHex(ctx,W/2,H/2,110,hexToRgba(pal.a1,0.14),null);
-  drawHex(ctx,W/2,H/2,75,hexToRgba(pal.a1,0.24),hexToRgba(pal.a2,0.07));
-  const cGlow=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,100);cGlow.addColorStop(0,hexToRgba(pal.a1,0.14));cGlow.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=cGlow;ctx.fillRect(0,0,W,H);
-  for(let i=0;i<6;i++){const x=30+rng()*(W-60),y=30+rng()*(H-60),sz=3+rng()*9,shape=Math.floor(rng()*3);ctx.strokeStyle=hexToRgba(pal.a3,0.22+rng()*0.25);ctx.lineWidth=0.7;ctx.beginPath();if(shape===0){ctx.moveTo(x,y-sz);ctx.lineTo(x+sz,y);ctx.lineTo(x,y+sz);ctx.lineTo(x-sz,y);ctx.closePath();}else if(shape===1){ctx.arc(x,y,sz,0,Math.PI*2);}else{ctx.moveTo(x-sz,y);ctx.lineTo(x+sz,y);ctx.moveTo(x,y-sz);ctx.lineTo(x,y+sz);}ctx.stroke();}
-  ctx.strokeStyle=hexToRgba(pal.a1,0.28);ctx.lineWidth=0.5;
-  ctx.beginPath();ctx.moveTo(44,H/2-26);ctx.lineTo(W-44,H/2-26);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(44,H/2+52);ctx.lineTo(W-44,H/2+52);ctx.stroke();
-  ctx.font='bold 24px "Syne","Arial Black",Arial,sans-serif';ctx.textBaseline='alphabetic';
-  const informW=ctx.measureText('INFORM').width,staxW=ctx.measureText('STAX').width,gap=3,totalW=informW+gap+staxW,startX=(W-totalW)/2,logoY=H/2+14;
-  ctx.fillStyle='rgba(240,237,230,0.88)';ctx.fillText('INFORM',startX,logoY);
-  ctx.fillStyle=hexToRgba(pal.a1,0.95);ctx.fillText('STAX',startX+informW+gap,logoY);
-  const catLabel=(CAT_LABELS[article.cat]||article.cat||'').toUpperCase();
-  ctx.font='10px "DM Sans",Arial,sans-serif';ctx.fillStyle=hexToRgba(pal.a1,0.45);ctx.textAlign='center';ctx.fillText(catLabel,W/2,H/2+38);
-  for(let y=0;y<H;y+=3){ctx.fillStyle='rgba(0,0,0,0.055)';ctx.fillRect(0,y,W,1);}
-  ctx.textAlign='left';ctx.textBaseline='alphabetic';
-}
-
-/* ============================================================
-   DYNAMIC CATEGORY TABS
-   ============================================================ */
-function renderCategories(){
-  const wrap=document.getElementById('categories');
-  const activeCats=new Set(STATE.feeds.map(f=>f.cat));
-  const current=STATE.currentCat;
-  wrap.innerHTML='<div class="cat '+(current==='all'?'active':'')+'" data-cat="all">All</div>';
-  Object.keys(CAT_LABELS).forEach(cat=>{
-    if(!activeCats.has(cat))return;
-    const div=document.createElement('div');
-    div.className='cat'+(current===cat?' active':'');
-    div.dataset.cat=cat;div.textContent=CAT_LABELS[cat];
-    wrap.appendChild(div);
-  });
-}
-
 function init(){
-  loadState();applyWhiteLabel();syncModeUI();setThemeLabel();buildMasterDropdown();renderCategories();loadAllFeeds();
+  loadState();applyWhiteLabel();syncModeUI();setThemeLabel();buildMasterDropdown();loadAllFeeds();
   document.getElementById('mint-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('mint-overlay'))closeMintModal();});
   document.getElementById('wallet-selector-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('wallet-selector-overlay'))closeWalletSelector();});
 }
 
-window.renderCategories=renderCategories;window.generateNFTArt=generateNFTArt;window.toggleTheme=toggleTheme;window.toggleMode=toggleMode;window.switchTab=switchTab;
+window.toggleTheme=toggleTheme;window.toggleMode=toggleMode;window.switchTab=switchTab;
 window.saveAndApply=saveAndApply;window.addFeed=addFeed;window.removeFeed=removeFeed;
 window.resetFeeds=resetFeeds;window.closeAdmin=closeAdmin;window.fillFromMaster=fillFromMaster;
 window.openMintModal=openMintModal;window.closeMintModal=closeMintModal;
