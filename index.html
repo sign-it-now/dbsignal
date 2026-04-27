@@ -517,24 +517,29 @@ const MASTER_FEEDS=[
 const CAT_LABELS={'ai-llm':'🤖 AI / LLM','tech':'💻 Tech','cloud':'☁️ Cloud','blockchain':'⛓️ Blockchain','science':'🔬 Science','biology':'🧬 Biology','math':'➗ Math','health':'💊 Health','engineering':'⚙️ Engineering','business':'👔 Business','space':'🛸 Space'};
 
 const DEFAULT_FEEDS=[
-  {url:'https://openai.com/news/rss.xml',source:'OpenAI',cat:'ai-llm'},
-  {url:'https://singularityhub.com/feed/',source:'Singularity Hub',cat:'ai-llm'},
   {url:'https://jack-clark.net/feed/',source:'Import AI',cat:'ai-llm'},
+  {url:'https://huggingface.co/blog/feed.xml',source:'Hugging Face',cat:'ai-llm'},
+  {url:'https://bair.berkeley.edu/blog/feed.xml',source:'Berkeley AI',cat:'ai-llm'},
   {url:'https://www.wired.com/feed/tag/ai/latest/rss',source:'Wired',cat:'tech'},
   {url:'https://techcrunch.com/feed/',source:'TechCrunch',cat:'tech'},
+  {url:'https://spectrum.ieee.org/feeds/feed.rss',source:'IEEE Spectrum',cat:'tech'},
+  {url:'https://news.ycombinator.com/rss',source:'Hacker News',cat:'tech'},
   {url:'https://thenewstack.io/feed/',source:'The New Stack',cat:'cloud'},
+  {url:'https://aws.amazon.com/blogs/aws/feed/',source:'AWS Blog',cat:'cloud'},
+  {url:'https://azure.microsoft.com/en-us/blog/feed/',source:'Azure Blog',cat:'cloud'},
   {url:'https://cointelegraph.com/rss',source:'CoinTelegraph',cat:'blockchain'},
   {url:'https://decrypt.co/feed',source:'Decrypt',cat:'blockchain'},
+  {url:'https://bitcoinmagazine.com/feed',source:'Bitcoin Magazine',cat:'blockchain'},
   {url:'https://www.sciencedaily.com/rss/all.xml',source:'ScienceDaily',cat:'science'},
   {url:'https://phys.org/rss-feed/',source:'Phys.org',cat:'science'},
+  {url:'https://www.newscientist.com/feed/home/',source:'New Scientist',cat:'science'},
   {url:'https://www.sciencedaily.com/rss/plants_animals/biology.xml',source:'ScienceDaily Biology',cat:'biology'},
+  {url:'https://elifesciences.org/rss/recent.xml',source:'eLife Sciences',cat:'biology'},
   {url:'https://plus.maths.org/content/rss.xml',source:'Plus Maths',cat:'math'},
-  {url:'https://www.statnews.com/feed/',source:'STAT News',cat:'health'},
+  {url:'https://www.quantamagazine.org/mathematics/feed/',source:'Quanta Math',cat:'math'},
+  {url:'https://www.nejm.org/action/showFeed?jc=nejm&type=etoc&feed=rss',source:'NEJM',cat:'health'},
   {url:'https://hackaday.com/feed/',source:'Hackaday',cat:'engineering'},
-  {url:'https://newatlas.com/index.rss',source:'New Atlas',cat:'engineering'},
-  {url:'https://www.inc.com/rss',source:'Inc Magazine',cat:'business'},
-  {url:'https://www.nasa.gov/rss/dyn/breaking_news.rss',source:'NASA',cat:'space'},
-  {url:'https://futurism.com/feed',source:'Futurism',cat:'space'},
+  {url:'https://openai.com/news/rss.xml',source:'OpenAI',cat:'ai-llm'},
 ];
 
 const RSS2JSON='https://api.rss2json.com/v1/api.json?rss_url=';
@@ -556,17 +561,16 @@ function loadState(){
     STATE.wlTitle=s.wlTitle||'InformStax';
     STATE.wlSub=s.wlSub||'LLM';
     STATE.wlTag=s.wlTag||'LLM · AI · Machine Learning';
-    // v3: reset stale feeds if they lack multi-category coverage
-    const cats=new Set((s.feeds||[]).map(f=>f.cat));
-    const fullCoverage=['science','biology','math','health','engineering','space','cloud','blockchain'].some(c=>cats.has(c));
-    if(s.feeds&&s.feeds.length&&fullCoverage)STATE.feeds=s.feeds;
+    // v4: hard version check — wipe stale feeds if not on v4
+    if(s.feedsVersion===4&&s.feeds&&s.feeds.length)STATE.feeds=s.feeds;
   }catch(e){}
 }
 function persistState(){
   localStorage.setItem('dbsignal_v2',JSON.stringify({
     mode:STATE.mode,apiKey:STATE.apiKey,siteKey:STATE.siteKey,
     wlTitle:STATE.wlTitle,wlSub:STATE.wlSub,wlTag:STATE.wlTag,
-    feeds:STATE.feeds,theme:document.documentElement.getAttribute('data-theme')
+    feeds:STATE.feeds,theme:document.documentElement.getAttribute('data-theme'),
+    feedsVersion:4
   }));
 }
 
@@ -651,7 +655,22 @@ function decodeEntities(str){const txt=document.createElement('textarea');txt.in
 function stripHTML(html){return html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();}
 function escHTML(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-async function loadAllFeeds(){renderSkeletons();const results=await Promise.allSettled(STATE.feeds.map(fetchFeed));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);STATE.articles=articles;renderCards(articles);}
+async function loadAllFeeds(){
+  renderSkeletons();
+  const feeds=STATE.feeds;
+  const BATCH=3;const DELAY=1500;
+  let articles=[];
+  for(let i=0;i<feeds.length;i+=BATCH){
+    const batch=feeds.slice(i,i+BATCH);
+    const results=await Promise.allSettled(batch.map(fetchFeed));
+    results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});
+    if(i+BATCH<feeds.length)await new Promise(res=>setTimeout(res,DELAY));
+  }
+  const seen=new Set();
+  articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});
+  articles.sort(()=>Math.random()-.5);
+  STATE.articles=articles;renderCards(articles);
+}
 function renderSkeletons(){document.getElementById('feed').innerHTML=Array.from({length:6}).map(()=>`<div class="card"><div class="card-header"><div class="skeleton short"></div><div class="skeleton" style="width:50px"></div></div><div class="card-body"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton short"></div><div class="skeleton tall" style="margin-top:10px"></div></div><div class="card-footer"><div class="skeleton" style="width:60px"></div><div class="skeleton" style="width:80px"></div></div></div>`).join('');}
 function renderCards(articles){const feed=document.getElementById('feed');const list=STATE.currentCat==='all'?articles:articles.filter(a=>a.cat===STATE.currentCat);if(!list.length){feed.innerHTML=`<div class="state-box"><div class="icon">📡</div><div>No articles for this category.<br><small style="color:var(--faint)">Add feeds via Creator Settings (click logo 5×)</small></div></div>`;return;}feed.innerHTML=list.map((a,i)=>cardHTML(a,i)).join('');if(STATE.mode==='edge'&&getActiveKey())list.forEach((a,i)=>{if(!a.rewritten&&!a.rewriting)rewriteArticle(a,i,list);});}
 
