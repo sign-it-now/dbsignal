@@ -518,17 +518,23 @@ const CAT_LABELS={'ai-llm':'🤖 AI / LLM','tech':'💻 Tech','cloud':'☁️ Cl
 
 const DEFAULT_FEEDS=[
   {url:'https://openai.com/news/rss.xml',source:'OpenAI',cat:'ai-llm'},
-  {url:'https://venturebeat.com/category/ai/feed/',source:'VentureBeat',cat:'ai-llm'},
-  {url:'https://feeds.arstechnica.com/arstechnica/index',source:'Ars Technica',cat:'tech'},
+  {url:'https://singularityhub.com/feed/',source:'Singularity Hub',cat:'ai-llm'},
+  {url:'https://jack-clark.net/feed/',source:'Import AI',cat:'ai-llm'},
   {url:'https://www.wired.com/feed/tag/ai/latest/rss',source:'Wired',cat:'tech'},
-  {url:'https://techcrunch.com/feed/',source:'TechCrunch',cat:'business'},
-  {url:'https://bair.berkeley.edu/blog/feed.xml',source:'Berkeley AI',cat:'ai-llm'},
-  {url:'https://developer.nvidia.com/blog/feed/',source:'NVIDIA Dev',cat:'tech'},
-  {url:'https://aibusiness.com/rss.xml',source:'AI Business',cat:'business'},
-  {url:'https://www.theguardian.com/technology/artificialintelligenceai/rss',source:'The Guardian',cat:'ai-llm'},
-  {url:'https://futurism.com/categories/ai-artificial-intelligence/feed',source:'Futurism',cat:'ai-llm'},
-  {url:'https://machinelearningmastery.com/blog/feed',source:'ML Mastery',cat:'ai-llm'},
-  {url:'https://simonwillison.net/atom/everything/',source:'Simon Willison',cat:'tech'},
+  {url:'https://techcrunch.com/feed/',source:'TechCrunch',cat:'tech'},
+  {url:'https://thenewstack.io/feed/',source:'The New Stack',cat:'cloud'},
+  {url:'https://cointelegraph.com/rss',source:'CoinTelegraph',cat:'blockchain'},
+  {url:'https://decrypt.co/feed',source:'Decrypt',cat:'blockchain'},
+  {url:'https://www.sciencedaily.com/rss/all.xml',source:'ScienceDaily',cat:'science'},
+  {url:'https://phys.org/rss-feed/',source:'Phys.org',cat:'science'},
+  {url:'https://www.sciencedaily.com/rss/plants_animals/biology.xml',source:'ScienceDaily Biology',cat:'biology'},
+  {url:'https://plus.maths.org/content/rss.xml',source:'Plus Maths',cat:'math'},
+  {url:'https://www.statnews.com/feed/',source:'STAT News',cat:'health'},
+  {url:'https://hackaday.com/feed/',source:'Hackaday',cat:'engineering'},
+  {url:'https://newatlas.com/index.rss',source:'New Atlas',cat:'engineering'},
+  {url:'https://www.inc.com/rss',source:'Inc Magazine',cat:'business'},
+  {url:'https://www.nasa.gov/rss/dyn/breaking_news.rss',source:'NASA',cat:'space'},
+  {url:'https://futurism.com/feed',source:'Futurism',cat:'space'},
 ];
 
 const RSS2JSON='https://api.rss2json.com/v1/api.json?rss_url=';
@@ -550,7 +556,10 @@ function loadState(){
     STATE.wlTitle=s.wlTitle||'InformStax';
     STATE.wlSub=s.wlSub||'LLM';
     STATE.wlTag=s.wlTag||'LLM · AI · Machine Learning';
-    if(s.feeds&&s.feeds.length)STATE.feeds=s.feeds;
+    // v3: reset stale feeds if they lack multi-category coverage
+    const cats=new Set((s.feeds||[]).map(f=>f.cat));
+    const fullCoverage=['science','biology','math','health','engineering','space','cloud','blockchain'].some(c=>cats.has(c));
+    if(s.feeds&&s.feeds.length&&fullCoverage)STATE.feeds=s.feeds;
   }catch(e){}
 }
 function persistState(){
@@ -618,7 +627,7 @@ document.getElementById('categories').addEventListener('click',e=>{const cat=e.t
 async function fetchWithTimeout(url,ms=9000){const ctrl=new AbortController();const id=setTimeout(()=>ctrl.abort(),ms);try{const r=await fetch(url,{signal:ctrl.signal});clearTimeout(id);return r;}catch(e){clearTimeout(id);throw e;}}
 async function fetchFeed(feed){
   // Proxy 1: rss2json — most reliable
-  try{const res=await fetchWithTimeout(RSS2JSON+encodeURIComponent(feed.url)+'&count=3',9000);const data=await res.json();if(data.status==='ok'&&data.items&&data.items.length)return data.items.map(item=>({title:decodeEntities(item.title||''),link:item.link||item.guid||'#',summary:decodeEntities(stripHTML(item.description||item.content||'')).slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
+  try{const res=await fetchWithTimeout(RSS2JSON+encodeURIComponent(feed.url),9000);const data=await res.json();if(data.status==='ok'&&data.items&&data.items.length)return data.items.map(item=>({title:decodeEntities(item.title||''),link:item.link||item.guid||'#',summary:decodeEntities(stripHTML(item.description||item.content||'')).slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
   // Proxy 2: allorigins — fallback
   try{const res=await fetchWithTimeout(ALLORIGINS+encodeURIComponent(feed.url),6000);const data=await res.json();if(data&&data.contents){const items=parseRSSXML(data.contents,feed);if(items.length)return items;}}catch{}
   // Proxy 3: corsproxy — last resort
