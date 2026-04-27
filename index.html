@@ -617,12 +617,12 @@ document.getElementById('categories').addEventListener('click',e=>{const cat=e.t
 
 async function fetchWithTimeout(url,ms=9000){const ctrl=new AbortController();const id=setTimeout(()=>ctrl.abort(),ms);try{const r=await fetch(url,{signal:ctrl.signal});clearTimeout(id);return r;}catch(e){clearTimeout(id);throw e;}}
 async function fetchFeed(feed){
-  // Proxy 1: allorigins
-  try{const res=await fetchWithTimeout(ALLORIGINS+encodeURIComponent(feed.url));const data=await res.json();if(data&&data.contents){const items=parseRSSXML(data.contents,feed);if(items.length)return items;}}catch{}
-  // Proxy 2: corsproxy.io
-  try{const res=await fetchWithTimeout(CORSPROXY+encodeURIComponent(feed.url));const text=await res.text();const items=parseRSSXML(text,feed);if(items.length)return items;}catch{}
-  // Proxy 3: rss2json
-  try{const res=await fetchWithTimeout(RSS2JSON+encodeURIComponent(feed.url)+'&count=3');const data=await res.json();if(data.status==='ok')return data.items.map(item=>({title:decodeEntities(item.title||''),link:item.link||item.guid||'#',summary:decodeEntities(stripHTML(item.description||item.content||'')).slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
+  // Proxy 1: rss2json — most reliable
+  try{const res=await fetchWithTimeout(RSS2JSON+encodeURIComponent(feed.url)+'&count=3',9000);const data=await res.json();if(data.status==='ok'&&data.items&&data.items.length)return data.items.map(item=>({title:decodeEntities(item.title||''),link:item.link||item.guid||'#',summary:decodeEntities(stripHTML(item.description||item.content||'')).slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
+  // Proxy 2: allorigins — fallback
+  try{const res=await fetchWithTimeout(ALLORIGINS+encodeURIComponent(feed.url),6000);const data=await res.json();if(data&&data.contents){const items=parseRSSXML(data.contents,feed);if(items.length)return items;}}catch{}
+  // Proxy 3: corsproxy — last resort
+  try{const res=await fetchWithTimeout(CORSPROXY+encodeURIComponent(feed.url),6000);const text=await res.text();const items=parseRSSXML(text,feed);if(items.length)return items;}catch{}
   return[];
 }
 function parseRSSXML(xmlStr,feed){
