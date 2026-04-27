@@ -533,9 +533,10 @@ const DEFAULT_FEEDS=[
 
 const RSS2JSON='https://api.rss2json.com/v1/api.json?rss_url=';
 const ALLORIGINS='https://api.allorigins.win/get?url=';
+const CORSPROXY='https://corsproxy.io/?';
 const WC_PROJECT_ID='614e499dd10274d1b266be0c640c10c1';
 
-let STATE={mode:'beards',siteKey:'',apiKey:'',wlTitle:'InformStax',wlSub:'.com',wlTag:'LLM · AI · Machine Learning',feeds:JSON.parse(JSON.stringify(DEFAULT_FEEDS)),articles:[],currentCat:'all',unlockCount:0};
+let STATE={mode:'beards',siteKey:'',apiKey:'',wlTitle:'InformStax',wlSub:'LLM',wlTag:'LLM · AI · Machine Learning',feeds:JSON.parse(JSON.stringify(DEFAULT_FEEDS)),articles:[],currentCat:'all',unlockCount:0};
 let walletState={connected:false,accountId:null,provider:null};
 
 function getActiveKey(){return STATE.apiKey||STATE.siteKey||'';}
@@ -547,7 +548,7 @@ function loadState(){
     if(s.apiKey)STATE.apiKey=s.apiKey;
     if(s.siteKey)STATE.siteKey=s.siteKey;
     STATE.wlTitle=s.wlTitle||'InformStax';
-    STATE.wlSub=(s.wlSub&&s.wlSub!=='LLM')?s.wlSub:'.com';
+    STATE.wlSub=s.wlSub||'LLM';
     STATE.wlTag=s.wlTag||'LLM · AI · Machine Learning';
     if(s.feeds&&s.feeds.length)STATE.feeds=s.feeds;
   }catch(e){}
@@ -608,15 +609,20 @@ function saveAndApply(){
   STATE.siteKey=siteKey;STATE.apiKey=personalKey;STATE.wlTitle=wlT;STATE.wlSub=wlS;STATE.wlTag=wlTag;
   persistState();applyWhiteLabel();
   ['status-mode','status-feeds','status-label','status-api'].forEach(id=>setStatus(id,'✓ Saved.','ok'));
-  setTimeout(()=>{closeAdmin();renderCategories();try{localStorage.removeItem('dbsignal_articles_v1');localStorage.removeItem('dbsignal_articles_v2');}catch{}loadAllFeeds();},700);
+  setTimeout(()=>{closeAdmin();loadAllFeeds();},700);
 }
 function applyWhiteLabel(){document.getElementById('topic-label').textContent=STATE.wlTitle+' — '+STATE.wlTag;document.getElementById('nav-sub').textContent=STATE.wlSub;document.title=STATE.wlTitle+' — LLM Intelligence';}
 
 document.getElementById('categories').addEventListener('click',e=>{const cat=e.target.dataset.cat;if(!cat)return;STATE.currentCat=cat;document.querySelectorAll('.cat').forEach(el=>el.classList.toggle('active',el.dataset.cat===cat));renderCards(STATE.articles);});
 
+async function fetchWithTimeout(url,ms=9000){const ctrl=new AbortController();const id=setTimeout(()=>ctrl.abort(),ms);try{const r=await fetch(url,{signal:ctrl.signal});clearTimeout(id);return r;}catch(e){clearTimeout(id);throw e;}}
 async function fetchFeed(feed){
-  try{const res=await fetch(ALLORIGINS+encodeURIComponent(feed.url));const data=await res.json();if(data&&data.contents){const items=parseRSSXML(data.contents,feed);if(items.length)return items;}}catch{}
-  try{const res=await fetch(RSS2JSON+encodeURIComponent(feed.url)+'&count=3');const data=await res.json();if(data.status==='ok')return data.items.map(item=>({title:decodeEntities(item.title||''),link:item.link||item.guid||'#',summary:decodeEntities(stripHTML(item.description||item.content||'')).slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
+  // Proxy 1: allorigins
+  try{const res=await fetchWithTimeout(ALLORIGINS+encodeURIComponent(feed.url));const data=await res.json();if(data&&data.contents){const items=parseRSSXML(data.contents,feed);if(items.length)return items;}}catch{}
+  // Proxy 2: corsproxy.io
+  try{const res=await fetchWithTimeout(CORSPROXY+encodeURIComponent(feed.url));const text=await res.text();const items=parseRSSXML(text,feed);if(items.length)return items;}catch{}
+  // Proxy 3: rss2json
+  try{const res=await fetchWithTimeout(RSS2JSON+encodeURIComponent(feed.url)+'&count=3');const data=await res.json();if(data.status==='ok')return data.items.map(item=>({title:decodeEntities(item.title||''),link:item.link||item.guid||'#',summary:decodeEntities(stripHTML(item.description||item.content||'')).slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
   return[];
 }
 function parseRSSXML(xmlStr,feed){
@@ -636,32 +642,7 @@ function decodeEntities(str){const txt=document.createElement('textarea');txt.in
 function stripHTML(html){return html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();}
 function escHTML(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-const CACHE_KEY='dbsignal_articles_v2';
-const CACHE_TTL=20*60*1000;
-const CORSFLARE='https://corsproxy.io/?';
-
-function getCachedArticles(){try{const raw=localStorage.getItem(CACHE_KEY);if(!raw)return null;const{ts,articles}=JSON.parse(raw);if(Date.now()-ts>CACHE_TTL)return null;return articles;}catch{return null;}}
-function setCachedArticles(articles){try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),articles}));}catch{}}
-
-async function loadAllFeeds(){
-  const cached=getCachedArticles();
-  if(cached&&cached.length){STATE.articles=cached;renderCards(cached);refreshInBackground();return;}
-  renderSkeletons();const results=await Promise.allSettled(STATE.feeds.map(fetchFeedMulti));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);if(articles.length)setCachedArticles(articles);STATE.articles=articles;renderCards(articles);}
-async function refreshInBackground(){try{const results=await Promise.allSettled(STATE.feeds.map(fetchFeedMulti));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);if(articles.length){setCachedArticles(articles);STATE.articles=articles;renderCards(articles);}}catch{}}
-async function fetchFeedMulti(feed){
-  const proxies=[ALLORIGINS,CORSFLARE];
-  for(const proxy of proxies){
-    try{
-      const res=await fetch(proxy+encodeURIComponent(feed.url),{signal:AbortSignal.timeout(8000)});
-      const text=await res.text();
-      let contents=text;
-      try{const j=JSON.parse(text);if(j.contents)contents=j.contents;}catch{}
-      const items=parseRSSXML(contents,feed);if(items.length)return items;
-    }catch{}
-  }
-  try{const res=await fetch(RSS2JSON+encodeURIComponent(feed.url)+'&count=3',{signal:AbortSignal.timeout(8000)});const data=await res.json();if(data.status==='ok')return data.items.map(item=>({title:decodeEntities(item.title||''),link:item.link||item.guid||'#',summary:decodeEntities(stripHTML(item.description||item.content||'')).slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
-  return[];
-}
+async function loadAllFeeds(){renderSkeletons();const results=await Promise.allSettled(STATE.feeds.map(fetchFeed));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);STATE.articles=articles;renderCards(articles);}
 function renderSkeletons(){document.getElementById('feed').innerHTML=Array.from({length:6}).map(()=>`<div class="card"><div class="card-header"><div class="skeleton short"></div><div class="skeleton" style="width:50px"></div></div><div class="card-body"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton short"></div><div class="skeleton tall" style="margin-top:10px"></div></div><div class="card-footer"><div class="skeleton" style="width:60px"></div><div class="skeleton" style="width:80px"></div></div></div>`).join('');}
 function renderCards(articles){const feed=document.getElementById('feed');const list=STATE.currentCat==='all'?articles:articles.filter(a=>a.cat===STATE.currentCat);if(!list.length){feed.innerHTML=`<div class="state-box"><div class="icon">📡</div><div>No articles for this category.<br><small style="color:var(--faint)">Add feeds via Creator Settings (click logo 5×)</small></div></div>`;return;}feed.innerHTML=list.map((a,i)=>cardHTML(a,i)).join('');if(STATE.mode==='edge'&&getActiveKey())list.forEach((a,i)=>{if(!a.rewritten&&!a.rewriting)rewriteArticle(a,i,list);});}
 
