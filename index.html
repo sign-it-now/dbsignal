@@ -150,6 +150,15 @@ a{text-decoration:none}
 .nft-quote-text{font-family:'Playfair Display',serif;font-size:.85rem;font-style:italic;color:#e8e4db;line-height:1.5;text-align:center}
 .nft-watermark{position:absolute;bottom:8px;right:10px;font-size:.58rem;color:rgba(232,197,71,0.35);letter-spacing:.06em;text-transform:uppercase;font-family:'Syne',sans-serif;font-weight:700;display:none}
 .nft-watermark.show{display:block}
+/* NFT Generative Art */
+#nft-art-display{width:100%;height:100%;position:absolute;top:0;left:0;display:none;z-index:1}
+#nft-art-display svg{width:100%;height:100%;display:block}
+#nft-art-loading{position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;z-index:1;background:#060606}
+.nft-loading-spin{width:22px;height:22px;border:3px solid #1c1c1c;border-top-color:#E8C547;border-radius:50%;animation:spin .7s linear infinite}
+.nft-loading-label{font-size:.65rem;color:#E8C547;letter-spacing:.08em;text-transform:uppercase}
+#nft-art-fallback{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;z-index:1}
+.nft-quote-overlay{z-index:10}
+.nft-watermark{z-index:10}
 .nft-meta{padding:.75rem 1rem;border-top:1px solid #1c1c1c;display:flex;align-items:center;justify-content:space-between}
 .nft-meta-title{font-size:.75rem;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:.5rem}
 .nft-meta-badge{font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;padding:3px 8px;border-radius:20px;font-weight:700;flex-shrink:0}
@@ -340,8 +349,17 @@ a{text-decoration:none}
     <div class="mint-header"><div class="mint-title">✦ Mint This Moment</div><button class="mint-close" onclick="closeMintModal()">✕</button></div>
     <div class="nft-preview">
       <div class="nft-image-area">
-        <div class="nft-logo-large">INFORM<span>STAX</span></div>
-        <div class="nft-placeholder-label">Image Coming Soon</div>
+        <!-- Dynamic art (z-index 1) -->
+        <div id="nft-art-display"></div>
+        <div id="nft-art-loading">
+          <div class="nft-loading-spin"></div>
+          <div class="nft-loading-label">✦ Generating Flat Vector Art…</div>
+        </div>
+        <div id="nft-art-fallback">
+          <div class="nft-logo-large">INFORM<span>STAX</span></div>
+          <div class="nft-placeholder-label">Set API Key for AI Art</div>
+        </div>
+        <!-- Overlays float on top (z-index 10) -->
         <div class="nft-quote-overlay" id="nft-quote-overlay">
           <div class="nft-quote-text" id="nft-quote-text">"The future belongs to those who act on intelligence, not just consume it."</div>
           <div style="display:flex;align-items:center;gap:6px;font-size:.62rem;color:rgba(232,197,71,0.5);text-transform:uppercase;letter-spacing:.06em;margin-top:.4rem;justify-content:center">✦ Stax Edge Original</div>
@@ -517,34 +535,22 @@ const MASTER_FEEDS=[
 const CAT_LABELS={'ai-llm':'🤖 AI / LLM','tech':'💻 Tech','cloud':'☁️ Cloud','blockchain':'⛓️ Blockchain','science':'🔬 Science','biology':'🧬 Biology','math':'➗ Math','health':'💊 Health','engineering':'⚙️ Engineering','business':'👔 Business','space':'🛸 Space'};
 
 const DEFAULT_FEEDS=[
-  {url:'https://jack-clark.net/feed/',source:'Import AI',cat:'ai-llm'},
-  {url:'https://huggingface.co/blog/feed.xml',source:'Hugging Face',cat:'ai-llm'},
-  {url:'https://bair.berkeley.edu/blog/feed.xml',source:'Berkeley AI',cat:'ai-llm'},
-  {url:'https://www.wired.com/feed/tag/ai/latest/rss',source:'Wired',cat:'tech'},
-  {url:'https://techcrunch.com/feed/',source:'TechCrunch',cat:'tech'},
-  {url:'https://spectrum.ieee.org/feeds/feed.rss',source:'IEEE Spectrum',cat:'tech'},
-  {url:'https://news.ycombinator.com/rss',source:'Hacker News',cat:'tech'},
-  {url:'https://thenewstack.io/feed/',source:'The New Stack',cat:'cloud'},
-  {url:'https://aws.amazon.com/blogs/aws/feed/',source:'AWS Blog',cat:'cloud'},
-  {url:'https://azure.microsoft.com/en-us/blog/feed/',source:'Azure Blog',cat:'cloud'},
-  {url:'https://cointelegraph.com/rss',source:'CoinTelegraph',cat:'blockchain'},
-  {url:'https://decrypt.co/feed',source:'Decrypt',cat:'blockchain'},
-  {url:'https://bitcoinmagazine.com/feed',source:'Bitcoin Magazine',cat:'blockchain'},
-  {url:'https://www.sciencedaily.com/rss/all.xml',source:'ScienceDaily',cat:'science'},
-  {url:'https://phys.org/rss-feed/',source:'Phys.org',cat:'science'},
-  {url:'https://www.newscientist.com/feed/home/',source:'New Scientist',cat:'science'},
-  {url:'https://www.sciencedaily.com/rss/plants_animals/biology.xml',source:'ScienceDaily Biology',cat:'biology'},
-  {url:'https://elifesciences.org/rss/recent.xml',source:'eLife Sciences',cat:'biology'},
-  {url:'https://plus.maths.org/content/rss.xml',source:'Plus Maths',cat:'math'},
-  {url:'https://www.quantamagazine.org/mathematics/feed/',source:'Quanta Math',cat:'math'},
-  {url:'https://www.nejm.org/action/showFeed?jc=nejm&type=etoc&feed=rss',source:'NEJM',cat:'health'},
-  {url:'https://hackaday.com/feed/',source:'Hackaday',cat:'engineering'},
   {url:'https://openai.com/news/rss.xml',source:'OpenAI',cat:'ai-llm'},
+  {url:'https://venturebeat.com/category/ai/feed/',source:'VentureBeat',cat:'ai-llm'},
+  {url:'https://feeds.arstechnica.com/arstechnica/index',source:'Ars Technica',cat:'tech'},
+  {url:'https://www.wired.com/feed/tag/ai/latest/rss',source:'Wired',cat:'tech'},
+  {url:'https://techcrunch.com/feed/',source:'TechCrunch',cat:'business'},
+  {url:'https://bair.berkeley.edu/blog/feed.xml',source:'Berkeley AI',cat:'ai-llm'},
+  {url:'https://developer.nvidia.com/blog/feed/',source:'NVIDIA Dev',cat:'tech'},
+  {url:'https://aibusiness.com/rss.xml',source:'AI Business',cat:'business'},
+  {url:'https://www.theguardian.com/technology/artificialintelligenceai/rss',source:'The Guardian',cat:'ai-llm'},
+  {url:'https://futurism.com/categories/ai-artificial-intelligence/feed',source:'Futurism',cat:'ai-llm'},
+  {url:'https://machinelearningmastery.com/blog/feed',source:'ML Mastery',cat:'ai-llm'},
+  {url:'https://simonwillison.net/atom/everything/',source:'Simon Willison',cat:'tech'},
 ];
 
 const RSS2JSON='https://api.rss2json.com/v1/api.json?rss_url=';
 const ALLORIGINS='https://api.allorigins.win/get?url=';
-const CORSPROXY='https://corsproxy.io/?';
 const WC_PROJECT_ID='614e499dd10274d1b266be0c640c10c1';
 
 let STATE={mode:'beards',siteKey:'',apiKey:'',wlTitle:'InformStax',wlSub:'LLM',wlTag:'LLM · AI · Machine Learning',feeds:JSON.parse(JSON.stringify(DEFAULT_FEEDS)),articles:[],currentCat:'all',unlockCount:0};
@@ -561,16 +567,14 @@ function loadState(){
     STATE.wlTitle=s.wlTitle||'InformStax';
     STATE.wlSub=s.wlSub||'LLM';
     STATE.wlTag=s.wlTag||'LLM · AI · Machine Learning';
-    // v4: hard version check — wipe stale feeds if not on v4
-    if(s.feedsVersion===4&&s.feeds&&s.feeds.length)STATE.feeds=s.feeds;
+    if(s.feeds&&s.feeds.length)STATE.feeds=s.feeds;
   }catch(e){}
 }
 function persistState(){
   localStorage.setItem('dbsignal_v2',JSON.stringify({
     mode:STATE.mode,apiKey:STATE.apiKey,siteKey:STATE.siteKey,
     wlTitle:STATE.wlTitle,wlSub:STATE.wlSub,wlTag:STATE.wlTag,
-    feeds:STATE.feeds,theme:document.documentElement.getAttribute('data-theme'),
-    feedsVersion:4
+    feeds:STATE.feeds,theme:document.documentElement.getAttribute('data-theme')
   }));
 }
 
@@ -628,14 +632,9 @@ function applyWhiteLabel(){document.getElementById('topic-label').textContent=ST
 
 document.getElementById('categories').addEventListener('click',e=>{const cat=e.target.dataset.cat;if(!cat)return;STATE.currentCat=cat;document.querySelectorAll('.cat').forEach(el=>el.classList.toggle('active',el.dataset.cat===cat));renderCards(STATE.articles);});
 
-async function fetchWithTimeout(url,ms=9000){const ctrl=new AbortController();const id=setTimeout(()=>ctrl.abort(),ms);try{const r=await fetch(url,{signal:ctrl.signal});clearTimeout(id);return r;}catch(e){clearTimeout(id);throw e;}}
 async function fetchFeed(feed){
-  // Proxy 1: rss2json — most reliable
-  try{const res=await fetchWithTimeout(RSS2JSON+encodeURIComponent(feed.url),9000);const data=await res.json();if(data.status==='ok'&&data.items&&data.items.length)return data.items.map(item=>({title:decodeEntities(item.title||''),link:item.link||item.guid||'#',summary:decodeEntities(stripHTML(item.description||item.content||'')).slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
-  // Proxy 2: allorigins — fallback
-  try{const res=await fetchWithTimeout(ALLORIGINS+encodeURIComponent(feed.url),6000);const data=await res.json();if(data&&data.contents){const items=parseRSSXML(data.contents,feed);if(items.length)return items;}}catch{}
-  // Proxy 3: corsproxy — last resort
-  try{const res=await fetchWithTimeout(CORSPROXY+encodeURIComponent(feed.url),6000);const text=await res.text();const items=parseRSSXML(text,feed);if(items.length)return items;}catch{}
+  try{const res=await fetch(ALLORIGINS+encodeURIComponent(feed.url));const data=await res.json();if(data&&data.contents){const items=parseRSSXML(data.contents,feed);if(items.length)return items;}}catch{}
+  try{const res=await fetch(RSS2JSON+encodeURIComponent(feed.url)+'&count=3');const data=await res.json();if(data.status==='ok')return data.items.map(item=>({title:decodeEntities(item.title||''),link:item.link||item.guid||'#',summary:decodeEntities(stripHTML(item.description||item.content||'')).slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
   return[];
 }
 function parseRSSXML(xmlStr,feed){
@@ -655,22 +654,7 @@ function decodeEntities(str){const txt=document.createElement('textarea');txt.in
 function stripHTML(html){return html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();}
 function escHTML(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-async function loadAllFeeds(){
-  renderSkeletons();
-  const feeds=STATE.feeds;
-  const BATCH=3;const DELAY=1500;
-  let articles=[];
-  for(let i=0;i<feeds.length;i+=BATCH){
-    const batch=feeds.slice(i,i+BATCH);
-    const results=await Promise.allSettled(batch.map(fetchFeed));
-    results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});
-    if(i+BATCH<feeds.length)await new Promise(res=>setTimeout(res,DELAY));
-  }
-  const seen=new Set();
-  articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});
-  articles.sort(()=>Math.random()-.5);
-  STATE.articles=articles;renderCards(articles);
-}
+async function loadAllFeeds(){renderSkeletons();const results=await Promise.allSettled(STATE.feeds.map(fetchFeed));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);STATE.articles=articles;renderCards(articles);}
 function renderSkeletons(){document.getElementById('feed').innerHTML=Array.from({length:6}).map(()=>`<div class="card"><div class="card-header"><div class="skeleton short"></div><div class="skeleton" style="width:50px"></div></div><div class="card-body"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton short"></div><div class="skeleton tall" style="margin-top:10px"></div></div><div class="card-footer"><div class="skeleton" style="width:60px"></div><div class="skeleton" style="width:80px"></div></div></div>`).join('');}
 function renderCards(articles){const feed=document.getElementById('feed');const list=STATE.currentCat==='all'?articles:articles.filter(a=>a.cat===STATE.currentCat);if(!list.length){feed.innerHTML=`<div class="state-box"><div class="icon">📡</div><div>No articles for this category.<br><small style="color:var(--faint)">Add feeds via Creator Settings (click logo 5×)</small></div></div>`;return;}feed.innerHTML=list.map((a,i)=>cardHTML(a,i)).join('');if(STATE.mode==='edge'&&getActiveKey())list.forEach((a,i)=>{if(!a.rewritten&&!a.rewriting)rewriteArticle(a,i,list);});}
 
@@ -717,10 +701,94 @@ const STAX_SYS=`You are the editorial voice for InformStax, a premium intelligen
 async function rewriteArticle(article,idx,list){article.rewriting=true;const cardEl=document.querySelector(`[data-idx="${idx}"]`);if(cardEl)cardEl.querySelector('.card-summary').innerHTML=`<div class="rewriting"><div class="spin"></div> Rewriting in Stax Edge...</div>`;try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getActiveKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:STAX_SYS,messages:[{role:'user',content:`Source: ${article.source}\nTitle: ${article.title}\nContent: ${article.summary}`}]})});const data=await res.json();article.rewritten=data.content?.[0]?.text||article.summary;}catch{article.rewritten=article.summary;}article.rewriting=false;if(cardEl){cardEl.querySelector('.card-summary').innerHTML=formatEdgeContent(article.rewritten);cardEl.classList.add('mode2');const tag=cardEl.querySelector('.card-mode-tag');if(tag){tag.className='card-mode-tag tag-edge';tag.textContent='Stax Edge';}}}
 
 let MINT_STATE={article:null,quoteOn:false,tier:'free',quoteText:''};
-function openMintModal(idx){const list=STATE.currentCat==='all'?STATE.articles:STATE.articles.filter(a=>a.cat===STATE.currentCat);const article=list[idx];if(!article)return;MINT_STATE={article,quoteOn:false,tier:'free',quoteText:''};document.getElementById('nft-meta-title').textContent=article.title;document.getElementById('quote-toggle').classList.remove('on');document.getElementById('nft-quote-overlay').classList.remove('show');document.getElementById('quote-desc').textContent='Add an original Stax Edge quote to your NFT';document.getElementById('wallet-install-notice').classList.remove('show');selectTier('free');document.getElementById('mint-overlay').classList.add('open');document.body.style.overflow='hidden';}
+function openMintModal(idx){
+  const list=STATE.currentCat==='all'?STATE.articles:STATE.articles.filter(a=>a.cat===STATE.currentCat);
+  const article=list[idx];if(!article)return;
+  MINT_STATE={article,quoteOn:false,tier:'free',quoteText:''};
+  document.getElementById('nft-meta-title').textContent=article.title;
+  document.getElementById('quote-toggle').classList.remove('on');
+  document.getElementById('nft-quote-overlay').classList.remove('show');
+  document.getElementById('quote-desc').textContent='Add an original Stax Edge quote to your NFT';
+  document.getElementById('wallet-install-notice').classList.remove('show');
+  selectTier('free');
+  document.getElementById('mint-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  generateNFTArt(article);
+}
 function closeMintModal(){document.getElementById('mint-overlay').classList.remove('open');document.body.style.overflow='';}
 function selectTier(tier){MINT_STATE.tier=tier;document.getElementById('pill-free').className='tier-pill'+(tier==='free'?' active-free':'');document.getElementById('pill-premium').className='tier-pill'+(tier==='premium'?' active-premium':'');const wm=document.getElementById('nft-watermark');tier==='free'?wm.classList.add('show'):wm.classList.remove('show');const badge=document.getElementById('nft-tier-badge');if(tier==='free'){badge.textContent='Free';badge.className='nft-meta-badge badge-free';document.getElementById('tier-desc').textContent='Free includes informstax.com watermark';}else{badge.textContent='Premium';badge.className='nft-meta-badge badge-premium';document.getElementById('tier-desc').textContent='Premium NFT — clean, no watermark';}}
 async function toggleMintQuote(){const toggle=document.getElementById('quote-toggle');MINT_STATE.quoteOn=!MINT_STATE.quoteOn;toggle.classList.toggle('on',MINT_STATE.quoteOn);const overlay=document.getElementById('nft-quote-overlay');const desc=document.getElementById('quote-desc');if(!MINT_STATE.quoteOn){overlay.classList.remove('show');desc.textContent='Add an original Stax Edge quote to your NFT';return;}overlay.classList.add('show');if(MINT_STATE.quoteText){document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;return;}const key=getActiveKey();if(key&&MINT_STATE.article){desc.textContent='✦ Generating Stax Edge quote…';document.getElementById('nft-quote-text').textContent='…';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:80,messages:[{role:'user',content:`Based on: "${MINT_STATE.article.title}"\nWrite ONE sharp CEO-level quote, 12-20 words. No quotes, no attribution.`}]})});const data=await res.json();MINT_STATE.quoteText=(data.content?.[0]?.text?.trim()||'Intelligence is the only asset that compounds without limit.').replace(/^["']|["']$/g,'');}catch{MINT_STATE.quoteText='Intelligence is the only asset that compounds without limit.';}document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;desc.textContent='✦ Stax Edge original quote generated';}else{MINT_STATE.quoteText='Intelligence is the only asset that compounds without limit.';document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;desc.textContent='✦ Stax Edge original quote';}}
+
+/* ============================================================
+   NFT GENERATIVE ART — Flat Vector SVG via Claude API
+   Triggered on mint modal open. Cached per article.
+   Beards Doctrine: original generative art, never copied.
+   ============================================================ */
+const NFT_ART_SYS=`You are a flat vector SVG artist. Create a 400x400 viewBox SVG illustration for a news story.
+Rules:
+- Flat vector ONLY: bold geometric shapes, NO gradients, NO photorealism, NO textures
+- Exactly 4-6 colors: bold, vibrant, high contrast (e.g. #E8C547, #1A1AFF, #FF3B30, #00C853, #222, #FFF)
+- Bold black outlines (stroke="black" stroke-width="2.5") on main shapes
+- Simple symbolic/abstract scene: circles, rectangles, triangles, paths only
+- Modern minimalist: large shapes, strong composition, white or dark background
+- RETURN ONLY the raw SVG — start with <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"> and end with </svg>
+- NO markdown, NO explanation, NO code fences`;
+
+function sanitizeSVG(svg){
+  return svg
+    .replace(/<script[\s\S]*?<\/script>/gi,'')
+    .replace(/on\w+\s*=\s*["'][^"']*["']/gi,'')
+    .replace(/javascript:/gi,'');
+}
+
+function showNFTLoading(){
+  document.getElementById('nft-art-display').style.display='none';
+  document.getElementById('nft-art-loading').style.display='flex';
+  document.getElementById('nft-art-fallback').style.display='none';
+}
+function showNFTArt(svgText){
+  const el=document.getElementById('nft-art-display');
+  el.innerHTML=sanitizeSVG(svgText);
+  el.style.display='block';
+  document.getElementById('nft-art-loading').style.display='none';
+  document.getElementById('nft-art-fallback').style.display='none';
+}
+function showNFTFallback(){
+  document.getElementById('nft-art-display').style.display='none';
+  document.getElementById('nft-art-loading').style.display='none';
+  document.getElementById('nft-art-fallback').style.display='flex';
+}
+
+async function generateNFTArt(article){
+  if(article.nftArt){showNFTArt(article.nftArt);return;}
+  const key=getActiveKey();
+  if(!key){showNFTFallback();return;}
+  showNFTLoading();
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:2000,
+        system:NFT_ART_SYS,
+        messages:[{role:'user',content:`News headline: "${article.title}"\nCategory: ${article.cat}\nSource: ${article.source}`}]
+      })
+    });
+    const data=await res.json();
+    let svg=(data.content?.[0]?.text||'').trim();
+    // Strip any markdown fences if Claude adds them
+    svg=svg.replace(/^```[\w]*\n?/,'').replace(/\n?```$/,'').trim();
+    if(svg.startsWith('<svg')){
+      article.nftArt=svg;
+      showNFTArt(svg);
+    }else{
+      showNFTFallback();
+    }
+  }catch(e){
+    showNFTFallback();
+  }
+}
 
 /* WALLETS */
 function hideMintBehindWC(){document.getElementById('mint-overlay').style.zIndex='0';}
@@ -787,7 +855,7 @@ function init(){
 window.toggleTheme=toggleTheme;window.toggleMode=toggleMode;window.switchTab=switchTab;
 window.saveAndApply=saveAndApply;window.addFeed=addFeed;window.removeFeed=removeFeed;
 window.resetFeeds=resetFeeds;window.closeAdmin=closeAdmin;window.fillFromMaster=fillFromMaster;
-window.openMintModal=openMintModal;window.closeMintModal=closeMintModal;
+window.generateNFTArt=generateNFTArt;window.openMintModal=openMintModal;window.closeMintModal=closeMintModal;
 window.toggleMintQuote=toggleMintQuote;window.selectTier=selectTier;
 window.connectWalletToMint=connectWalletToMint;window.closeWalletSelector=closeWalletSelector;
 window.connectMetaMask=connectMetaMask;window.connectHashPack=connectHashPack;
