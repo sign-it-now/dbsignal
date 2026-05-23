@@ -53,12 +53,7 @@ a{text-decoration:none}
 .card-summary .bottom-line span{color:var(--muted);font-weight:400}
 .card-footer{padding:.85rem 1.4rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.5rem}
 .card-date{font-size:.65rem;color:var(--faint);flex-shrink:0}
-/* SOURCE LINK — restored */
-.card-link{
-  font-size:.7rem;color:var(--accent);text-decoration:none;
-  display:flex;align-items:center;gap:4px;font-weight:500;
-  letter-spacing:.02em;transition:opacity .2s;white-space:nowrap;flex-shrink:0;
-}
+.card-link{font-size:.7rem;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:4px;font-weight:500;letter-spacing:.02em;transition:opacity .2s;white-space:nowrap;flex-shrink:0;}
 .card-link:hover{opacity:.7}
 .card-footer-right{display:flex;align-items:center;gap:.6rem;flex-shrink:0}
 .skeleton{background:linear-gradient(90deg,var(--border) 25%,var(--border2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:4px;height:14px;margin-bottom:8px}
@@ -71,10 +66,8 @@ a{text-decoration:none}
 .doctrine-icon{color:var(--accent);font-size:13px;padding-top:1px}
 .doctrine-text{font-size:.7rem;color:var(--faint);line-height:1.6}
 .doctrine-text strong{color:var(--muted);font-weight:600}
-/* MINT */
 .mint-btn{display:flex;align-items:center;gap:5px;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:20px;padding:.28rem .75rem;font-size:.68rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap;flex-shrink:0}
 .mint-btn:hover{background:var(--accent);color:var(--accent-text)}
-/* ADMIN */
 .admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-start;justify-content:center;backdrop-filter:blur(4px);padding:2rem 1rem;overflow-y:auto}
 .admin-overlay.open{display:flex}
 .admin-panel{background:var(--admin-bg);border:1px solid var(--border2);border-radius:12px;width:min(560px,100%);box-shadow:0 24px 80px rgba(0,0,0,.6);margin:auto}
@@ -129,7 +122,6 @@ a{text-decoration:none}
 .site-key-notice strong{color:var(--accent)}
 .state-box{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;padding:5rem 2rem;color:var(--muted);font-size:.85rem;text-align:center}
 .state-box .icon{font-size:2rem;opacity:.4}
-/* MINT MODAL */
 .mint-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)}
 .mint-overlay.open{display:flex}
 .mint-sheet{background:#0d0d0d;border:1px solid #1c1c1c;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:1.5rem 1.4rem 2.2rem;animation:slideUp .3s cubic-bezier(.32,.72,0,1);max-height:92vh;overflow-y:auto}
@@ -414,7 +406,7 @@ a{text-decoration:none}
 
 const MASTER_FEEDS=[
   {source:'OpenAI Blog',url:'https://openai.com/blog/rss.xml',cat:'ai-llm'},
-  {source:'Genesis News',url:'https://informstax.com/genesis-news.xml',cat:'ai-llm'},
+  {source:'Genesis LLM',url:'https://informstax.com/genesis-llm.xml',cat:'ai-llm'},
   {source:'Anthropic News',url:'https://www.anthropic.com/rss.xml',cat:'ai-llm'},
   {source:'Google DeepMind',url:'https://deepmind.google/blog/rss.xml',cat:'ai-llm'},
   {source:'Hugging Face Blog',url:'https://huggingface.co/blog/feed.xml',cat:'ai-llm'},
@@ -640,14 +632,10 @@ function decodeEntities(str){const txt=document.createElement('textarea');txt.in
 function stripHTML(html){return html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();}
 function escHTML(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-async function loadAllFeeds(){renderSkeletons();const results=await Promise.allSettled(STATE.feeds.map(fetchFeed));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);STATE.articles=articles;renderCards(articles);}
+async function loadAllFeeds(){renderSkeletons();const results=await Promise.allSettled(STATE.feeds.map(fetchFeed));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort((a,b)=>{const p=['Genesis News','Genesis LLM'];const ai=p.includes(a.source)?0:1;const bi=p.includes(b.source)?0:1;return ai-bi;});STATE.articles=articles;renderCards(articles);}
 function renderSkeletons(){document.getElementById('feed').innerHTML=Array.from({length:6}).map(()=>`<div class="card"><div class="card-header"><div class="skeleton short"></div><div class="skeleton" style="width:50px"></div></div><div class="card-body"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton short"></div><div class="skeleton tall" style="margin-top:10px"></div></div><div class="card-footer"><div class="skeleton" style="width:60px"></div><div class="skeleton" style="width:80px"></div></div></div>`).join('');}
 function renderCards(articles){const feed=document.getElementById('feed');const list=STATE.currentCat==='all'?articles:articles.filter(a=>a.cat===STATE.currentCat);if(!list.length){feed.innerHTML=`<div class="state-box"><div class="icon">📡</div><div>No articles for this category.<br><small style="color:var(--faint)">Add feeds via Creator Settings (click logo 5×)</small></div></div>`;return;}feed.innerHTML=list.map((a,i)=>cardHTML(a,i)).join('');if(STATE.mode==='edge'&&getActiveKey())list.forEach((a,i)=>{if(!a.rewritten&&!a.rewriting)rewriteArticle(a,i,list);});}
 
-/* ============================================================
-   CARD HTML — source link ALWAYS present in footer
-   Beards Doctrine: original article link is always visible
-   ============================================================ */
 function cardHTML(a,i){
   const isEdge=STATE.mode==='edge';
   const modeTag=isEdge?`<span class="card-mode-tag tag-edge">Stax Edge</span>`:`<span class="card-mode-tag tag-beards">Beards Doctrine</span>`;
@@ -656,12 +644,9 @@ function cardHTML(a,i){
   if(isEdge&&a.rewriting)body=`<div class="rewriting"><div class="spin"></div> Rewriting in Stax Edge...</div>`;
   else if(isEdge&&a.rewritten)body=formatEdgeContent(a.rewritten);
   else body=`<p>${escHTML(a.summary||'Fetching summary…')}</p>`;
-
-  // Source link always shown — Beards Doctrine compliance + legal RSS usage
   const sourceLink=a.link&&a.link!=='#'
     ? `<a class="card-link" href="${escHTML(a.link)}" target="_blank" rel="noopener noreferrer">Read Original ↗</a>`
     : '';
-
   return `<div class="card${isEdge?' mode2':''}" data-idx="${i}">
     <div class="card-header">
       <div class="card-source"><div class="src-dot"></div>${escHTML(a.source)}<span style="color:var(--faint);margin-left:4px;font-size:.6rem">${escHTML(catLabel)}</span></div>
@@ -692,7 +677,6 @@ function closeMintModal(){document.getElementById('mint-overlay').classList.remo
 function selectTier(tier){MINT_STATE.tier=tier;document.getElementById('pill-free').className='tier-pill'+(tier==='free'?' active-free':'');document.getElementById('pill-premium').className='tier-pill'+(tier==='premium'?' active-premium':'');const wm=document.getElementById('nft-watermark');tier==='free'?wm.classList.add('show'):wm.classList.remove('show');const badge=document.getElementById('nft-tier-badge');if(tier==='free'){badge.textContent='Free';badge.className='nft-meta-badge badge-free';document.getElementById('tier-desc').textContent='Free includes informstax.com watermark';}else{badge.textContent='Premium';badge.className='nft-meta-badge badge-premium';document.getElementById('tier-desc').textContent='Premium NFT — clean, no watermark';}}
 async function toggleMintQuote(){const toggle=document.getElementById('quote-toggle');MINT_STATE.quoteOn=!MINT_STATE.quoteOn;toggle.classList.toggle('on',MINT_STATE.quoteOn);const overlay=document.getElementById('nft-quote-overlay');const desc=document.getElementById('quote-desc');if(!MINT_STATE.quoteOn){overlay.classList.remove('show');desc.textContent='Add an original Stax Edge quote to your NFT';return;}overlay.classList.add('show');if(MINT_STATE.quoteText){document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;return;}const key=getActiveKey();if(key&&MINT_STATE.article){desc.textContent='✦ Generating Stax Edge quote…';document.getElementById('nft-quote-text').textContent='…';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:80,messages:[{role:'user',content:`Based on: "${MINT_STATE.article.title}"\nWrite ONE sharp coder-punk quote, 12-20 words. Technically grounded, a little irreverent, zero corporate speak. No quotes, no attribution.`}]})});const data=await res.json();MINT_STATE.quoteText=(data.content?.[0]?.text?.trim()||'Intelligence is the only asset that compounds without limit.').replace(/^["']|["']$/g,'');}catch{MINT_STATE.quoteText='Intelligence is the only asset that compounds without limit.';}document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;desc.textContent='✦ Stax Edge original quote generated';}else{MINT_STATE.quoteText='Intelligence is the only asset that compounds without limit.';document.getElementById('nft-quote-text').textContent=`"${MINT_STATE.quoteText}"`;desc.textContent='✦ Stax Edge original quote';}}
 
-/* WALLETS */
 function hideMintBehindWC(){document.getElementById('mint-overlay').style.zIndex='0';}
 function restoreMintAboveWC(){document.getElementById('mint-overlay').style.zIndex='300';}
 function connectWalletToMint(){if(walletState.connected){executeMint();return;}document.getElementById('wallet-install-notice').classList.remove('show');openWalletSelector();}
