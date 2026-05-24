@@ -514,7 +514,68 @@ function decodeEntities(str){const txt=document.createElement('textarea');txt.in
 function stripHTML(html){return html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();}
 function escHTML(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-async function loadAllFeeds(){renderSkeletons();const results=await Promise.allSettled(STATE.feeds.map(fetchFeed));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);STATE.articles=articles;renderCards(articles);}
+
+const GENESIS_ARTICLES=[
+  {
+    title:'Hedera HBAR Emerges as Enterprise Blockchain of Choice for Tokenized Assets',
+    link:'https://informstax.com/genesis-news.xml',
+    summary:"Hedera's hashgraph consensus is gaining serious traction among Fortune 500 enterprises building tokenized asset platforms. Unlike proof-of-work chains, Hedera offers deterministic finality in under 5 seconds at fractions of a cent per transaction — making it the only public ledger that actually scales for institutional volume.",
+    date:'May 23, 2026',
+    source:'Genesis News',
+    cat:'blockchain',
+    rewritten:null,rewriting:false
+  },
+  {
+    title:'NFT Minting Moves Beyond JPEG: Real-World Asset Tokenization Takes Center Stage',
+    link:'https://informstax.com/genesis-news.xml',
+    summary:"The NFT narrative has officially shifted from speculative art to provable ownership of real-world assets. Platforms building on Hedera and Ethereum are now minting tokenized real estate, IP rights, and media content — with legal enforceability finally catching up to the technology. The infrastructure wave is here.",
+    date:'May 23, 2026',
+    source:'Genesis News',
+    cat:'blockchain',
+    rewritten:null,rewriting:false
+  },
+  {
+    title:'SentX Marketplace Signals Maturity for Hedera NFT Ecosystem',
+    link:'https://informstax.com/genesis-news.xml',
+    summary:"SentX has quietly become the de facto NFT marketplace for the Hedera ecosystem, offering sub-cent minting fees and near-instant settlement. With over 95% market share on HBAR, SentX represents the critical infrastructure layer that turns token creation into real market liquidity.",
+    date:'May 23, 2026',
+    source:'Genesis News',
+    cat:'blockchain',
+    rewritten:null,rewriting:false
+  },
+  {
+    title:'Hedera HBAR Surpasses 10 Billion Transactions as Enterprise Adoption Accelerates',
+    link:'https://informstax.com/genesis-news.xml',
+    summary:"Hedera Hashgraph has crossed 10 billion total network transactions, driven by enterprise deployments in supply chain, tokenization, and decentralized identity. The milestone positions HBAR as the highest-throughput public ledger by verified transaction volume, outpacing Ethereum and Solana on pure throughput metrics. Institutional operators are increasingly selecting Hedera for compliance-grade infrastructure due to its governed council model and carbon-negative footprint.",
+    date:'May 23, 2026',
+    source:'Genesis News',
+    cat:'blockchain',
+    rewritten:null,rewriting:false
+  },
+  {
+    title:'BlackRock Expands Tokenized Treasury Fund to Three Additional Blockchains',
+    link:'https://informstax.com/genesis-news.xml',
+    summary:"BlackRock has extended its BUIDL tokenized money market fund to Avalanche, Aptos, and Hedera, bringing total on-chain AUM to $2.4 billion across six networks. The expansion signals that multi-chain tokenization is now standard operating procedure for institutional asset managers, not a pilot program. Fund managers without a cross-chain token strategy are now structurally behind peers already capturing yield on-chain.",
+    date:'May 23, 2026',
+    source:'Genesis News',
+    cat:'blockchain',
+    rewritten:null,rewriting:false
+  },
+  {
+    title:'SEC Finalizes Digital Asset Custody Rule, Clearing Path for Bank-Held Crypto',
+    link:'https://informstax.com/genesis-news.xml',
+    summary:"The SEC has issued final rules allowing federally chartered banks to custody digital assets directly, removing the SAB 121 accounting burden that previously blocked institutional participation. The ruling applies to tokenized securities, NFTs classified as financial instruments, and stablecoins held on behalf of clients. Analysts project the change will unlock over $400 billion in institutional crypto exposure that was previously sidelined by compliance constraints.",
+    date:'May 23, 2026',
+    source:'Genesis News',
+    cat:'blockchain',
+    rewritten:null,rewriting:false
+  },
+];
+
+async function loadAllFeeds(){
+  STATE.articles=GENESIS_ARTICLES;
+  renderCards(GENESIS_ARTICLES);
+});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);STATE.articles=articles;renderCards(articles);}
 function renderSkeletons(){document.getElementById('feed').innerHTML=Array.from({length:6}).map(()=>`<div class="card"><div class="card-header"><div class="skeleton short"></div><div class="skeleton" style="width:50px"></div></div><div class="card-body"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton short"></div><div class="skeleton tall" style="margin-top:10px"></div></div><div class="card-footer"><div class="skeleton" style="width:60px"></div><div class="skeleton" style="width:80px"></div></div></div>`).join('');}
 function renderCards(articles){const feed=document.getElementById('feed');const list=STATE.currentCat==='all'?articles:articles.filter(a=>a.cat===STATE.currentCat);if(!list.length){feed.innerHTML=`<div class="state-box"><div class="icon">📡</div><div>No articles for this category.<br><small style="color:var(--faint)">Add feeds via Creator Settings (click logo 5×)</small></div></div>`;return;}feed.innerHTML=list.map((a,i)=>cardHTML(a,i)).join('');if(STATE.mode==='edge'&&getActiveKey())list.forEach((a,i)=>{if(!a.rewritten&&!a.rewriting)rewriteArticle(a,i,list);});}
 
