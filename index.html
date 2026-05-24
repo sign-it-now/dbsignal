@@ -329,9 +329,8 @@ a{text-decoration:none}
     <div class="mint-handle"></div>
     <div class="mint-header"><div class="mint-title">✦ Mint This Moment</div><button class="mint-close" onclick="closeMintModal()">✕</button></div>
     <div class="nft-preview">
-      <div class="nft-image-area">
-        <div class="nft-logo-large">INFORM<span>STAX</span></div>
-        <div class="nft-placeholder-label">Image Coming Soon</div>
+      <div class="nft-image-area" style="padding:0;background:#080808;">
+        <canvas id="nft-canvas" width="480" height="480" style="width:100%;height:100%;display:block;border-radius:0;"></canvas>
         <div class="nft-quote-overlay" id="nft-quote-overlay">
           <div class="nft-quote-text" id="nft-quote-text">"The future belongs to those who act on intelligence, not just consume it."</div>
           <div style="display:flex;align-items:center;gap:6px;font-size:.62rem;color:rgba(232,197,71,0.5);text-transform:uppercase;letter-spacing:.06em;margin-top:.4rem;justify-content:center">✦ Stax Edge Original</div>
@@ -639,6 +638,193 @@ window.connectMetaMask=connectMetaMask;window.connectHashPack=connectHashPack;
 window.connectWalletConnect=connectWalletConnect;window.disconnectWallet=disconnectWallet;
 
 init();
+
+/* ============================================================
+   GENESIS NFT CANVAS ART — Option C
+   Seeded by article title hash. Zero API cost. Always renders.
+   Category-colored geometric art, branded InformStax.
+   ============================================================ */
+
+const CAT_COLORS={
+  'blockchain':['#E8C547','#c8a030','#8B6914','#2a1f00'],
+  'ai-llm':['#4FC3F7','#0288D1','#01579B','#001d2e'],
+  'tech':['#69F0AE','#00C853','#1B5E20','#001a00'],
+  'cloud':['#CE93D8','#AB47BC','#4A148C','#0d0015'],
+  'science':['#FF8A65','#E64A19','#BF360C','#1a0500'],
+  'biology':['#A5D6A7','#43A047','#1B5E20','#001500'],
+  'math':['#EF9A9A','#E53935','#B71C1C','#1a0000'],
+  'health':['#80DEEA','#00ACC1','#006064','#001a1c'],
+  'engineering':['#FFCC02','#FFB300','#FF6F00','#1a0d00'],
+  'business':['#F48FB1','#E91E63','#880E4F','#1a0011'],
+  'space':['#9FA8DA','#3F51B5','#1A237E','#000820'],
+};
+const DEFAULT_COLORS=['#E8C547','#c8a030','#8B6914','#2a1f00'];
+
+function hashStr(str){
+  let h=0;
+  for(let i=0;i<str.length;i++){h=Math.imul(31,h)+str.charCodeAt(i)|0;}
+  return Math.abs(h);
+}
+
+function seededRand(seed){
+  let s=seed;
+  return function(){s=(s*1664525+1013904223)&0xffffffff;return(s>>>0)/0xffffffff;};
+}
+
+function drawNFTCanvas(title,cat,source,watermark){
+  const canvas=document.getElementById('nft-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=480,H=480;
+  canvas.width=W;canvas.height=H;
+
+  const colors=CAT_COLORS[cat]||DEFAULT_COLORS;
+  const seed=hashStr(title||'genesis');
+  const rand=seededRand(seed);
+
+  // Background gradient
+  const bg=ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#060606');
+  bg.addColorStop(0.5,colors[3]||'#0a0a0a');
+  bg.addColorStop(1,'#090909');
+  ctx.fillStyle=bg;
+  ctx.fillRect(0,0,W,H);
+
+  // Grid lines subtle
+  ctx.strokeStyle='rgba(255,255,255,0.03)';
+  ctx.lineWidth=1;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  // Radial glow from seed point
+  const cx=W*(0.3+rand()*0.4),cy=H*(0.2+rand()*0.4);
+  const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,W*0.65);
+  glow.addColorStop(0,colors[0]+'22');
+  glow.addColorStop(0.5,colors[1]+'11');
+  glow.addColorStop(1,'transparent');
+  ctx.fillStyle=glow;
+  ctx.fillRect(0,0,W,H);
+
+  // Geometric shapes — hexagons / polygons
+  const numShapes=5+Math.floor(rand()*5);
+  for(let i=0;i<numShapes;i++){
+    const sx=rand()*W,sy=rand()*H;
+    const r=30+rand()*80;
+    const sides=Math.floor(3+rand()*5);
+    const rot=rand()*Math.PI*2;
+    const alpha=0.04+rand()*0.12;
+    ctx.beginPath();
+    for(let s=0;s<=sides;s++){
+      const angle=rot+(s/sides)*Math.PI*2;
+      const px=sx+Math.cos(angle)*r,py=sy+Math.sin(angle)*r;
+      s===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+    }
+    ctx.closePath();
+    ctx.strokeStyle=colors[i%colors.length]+(Math.floor(alpha*255).toString(16).padStart(2,'0'));
+    ctx.lineWidth=1+rand()*2;
+    ctx.stroke();
+  }
+
+  // Diagonal accent lines
+  const numLines=8+Math.floor(rand()*8);
+  for(let i=0;i<numLines;i++){
+    const x1=rand()*W,y1=rand()*H;
+    const len=60+rand()*180;
+    const angle=rand()*Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x1+Math.cos(angle)*len,y1+Math.sin(angle)*len);
+    const alpha=0.06+rand()*0.18;
+    ctx.strokeStyle=colors[i%2]+(Math.floor(alpha*255).toString(16).padStart(2,'0'));
+    ctx.lineWidth=0.5+rand()*1.5;
+    ctx.stroke();
+  }
+
+  // Dots scatter
+  for(let i=0;i<30;i++){
+    const dx=rand()*W,dy=rand()*H;
+    const dr=1+rand()*3;
+    ctx.beginPath();ctx.arc(dx,dy,dr,0,Math.PI*2);
+    ctx.fillStyle=colors[0]+(Math.floor((0.3+rand()*0.5)*255).toString(16).padStart(2,'0'));
+    ctx.fill();
+  }
+
+  // Bottom gradient overlay for text
+  const textBg=ctx.createLinearGradient(0,H-160,0,H);
+  textBg.addColorStop(0,'transparent');
+  textBg.addColorStop(1,'rgba(0,0,0,0.92)');
+  ctx.fillStyle=textBg;
+  ctx.fillRect(0,H-160,W,160);
+
+  // Source badge top-left
+  ctx.fillStyle=colors[0]+'cc';
+  ctx.beginPath();
+  const bw=ctx.measureText(source.toUpperCase()).width+24;
+  ctx.roundRect?ctx.roundRect(16,16,bw,22,4):ctx.rect(16,16,bw,22);
+  ctx.fill();
+  ctx.fillStyle='#080808';
+  ctx.font='bold 9px Syne, sans-serif';
+  ctx.letterSpacing='0.08em';
+  ctx.fillText(source.toUpperCase(),28,31);
+
+  // Title text (word-wrapped)
+  ctx.fillStyle='#f0ede6';
+  ctx.font='bold 18px Playfair Display, Georgia, serif';
+  ctx.letterSpacing='0';
+  const words=(title||'').split(' ');
+  const maxW=W-40;let line='';let ty=H-110;
+  const lines=[];
+  for(const w of words){
+    const test=line+(line?' ':'')+w;
+    if(ctx.measureText(test).width>maxW&&line){lines.push(line);line=w;}
+    else line=test;
+  }
+  if(line)lines.push(line);
+  const showLines=lines.slice(0,3);
+  showLines.forEach((l,i)=>{ctx.fillText(l,20,ty+i*26);});
+
+  // InformStax brand bottom
+  ctx.font='700 11px Syne, sans-serif';
+  ctx.letterSpacing='0.06em';
+  ctx.fillStyle=colors[0]+'cc';
+  ctx.fillText('INFORM',20,H-16);
+  const offX=20+ctx.measureText('INFORM').width;
+  ctx.fillStyle=colors[0];
+  ctx.fillText('STAX',offX,H-16);
+
+  // Watermark dot top-right corner
+  ctx.beginPath();ctx.arc(W-20,20,5,0,Math.PI*2);
+  ctx.fillStyle=colors[0]+'88';ctx.fill();
+
+  // Watermark text if free tier
+  if(watermark){
+    ctx.font='600 9px DM Sans, sans-serif';
+    ctx.fillStyle='rgba(232,197,71,0.4)';
+    ctx.letterSpacing='0.05em';
+    ctx.fillText('informstax.com',W-100,H-10);
+  }
+}
+
+/* Override openMintModal to draw canvas */
+const _origOpenMintModal=openMintModal;
+window.openMintModal=function(idx){
+  _origOpenMintModal(idx);
+  const list=STATE.currentCat==='all'?STATE.articles:STATE.articles.filter(a=>a.cat===STATE.currentCat);
+  const article=list[idx];
+  if(article){
+    drawNFTCanvas(article.title,article.cat,article.source,true);
+  }
+};
+
+/* Redraw on tier change */
+const _origSelectTier=selectTier;
+window.selectTier=function(tier){
+  _origSelectTier(tier);
+  if(MINT_STATE.article){
+    drawNFTCanvas(MINT_STATE.article.title,MINT_STATE.article.cat,MINT_STATE.article.source,tier==='free');
+  }
+};
+
 </script>
 
 <!-- © dbappsystems.com. All rights reserved. -->
