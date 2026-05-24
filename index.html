@@ -532,6 +532,7 @@ const DEFAULT_FEEDS=[
 
 const RSS2JSON='https://api.rss2json.com/v1/api.json?rss_url=';
 const ALLORIGINS='https://api.allorigins.win/get?url=';
+const CORSPROXY='https://corsproxy.io/?url=';
 const WC_PROJECT_ID='614e499dd10274d1b266be0c640c10c1';
 
 let STATE={mode:'beards',siteKey:'',apiKey:'',wlTitle:'InformStax',wlSub:'LLM',wlTag:'LLM · AI · Machine Learning',feeds:JSON.parse(JSON.stringify(DEFAULT_FEEDS)),articles:[],currentCat:'all',unlockCount:0};
@@ -614,8 +615,12 @@ function applyWhiteLabel(){document.getElementById('topic-label').textContent=ST
 document.getElementById('categories').addEventListener('click',e=>{const cat=e.target.dataset.cat;if(!cat)return;STATE.currentCat=cat;document.querySelectorAll('.cat').forEach(el=>el.classList.toggle('active',el.dataset.cat===cat));renderCards(STATE.articles);});
 
 async function fetchFeed(feed){
-  try{const res=await fetch(ALLORIGINS+encodeURIComponent(feed.url));const data=await res.json();if(data&&data.contents){const items=parseRSSXML(data.contents,feed);if(items.length)return items;}}catch{}
-  try{const res=await fetch(RSS2JSON+encodeURIComponent(feed.url)+'&count=3');const data=await res.json();if(data.status==='ok')return data.items.map(item=>({title:decodeEntities(item.title||''),link:item.link||item.guid||'#',summary:decodeEntities(stripHTML(item.description||item.content||'')).slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
+  // Proxy 1: allorigins
+  try{const res=await fetch(ALLORIGINS+encodeURIComponent(feed.url),{signal:AbortSignal.timeout(8000)});const data=await res.json();if(data&&data.contents){const items=parseRSSXML(data.contents,feed);if(items.length)return items;}}catch{}
+  // Proxy 2: corsproxy.io
+  try{const res=await fetch(CORSPROXY+encodeURIComponent(feed.url),{signal:AbortSignal.timeout(8000)});const xml=await res.text();if(xml&&xml.includes('<')){const items=parseRSSXML(xml,feed);if(items.length)return items;}}catch{}
+  // Proxy 3: rss2json
+  try{const res=await fetch(RSS2JSON+encodeURIComponent(feed.url)+'&count=3',{signal:AbortSignal.timeout(8000)});const data=await res.json();if(data.status==='ok')return data.items.map(item=>({title:decodeEntities(item.title||''),link:item.link||item.guid||'#',summary:decodeEntities(stripHTML(item.description||item.content||'')).slice(0,420),date:item.pubDate?new Date(item.pubDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',source:feed.source,cat:feed.cat,rewritten:null,rewriting:false}));}catch{}
   return[];
 }
 function parseRSSXML(xmlStr,feed){
@@ -637,7 +642,7 @@ function escHTML(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt
 
 async function loadAllFeeds(){renderSkeletons();const results=await Promise.allSettled(STATE.feeds.map(fetchFeed));let articles=[];results.forEach(r=>{if(r.status==='fulfilled')articles.push(...r.value);});const seen=new Set();articles=articles.filter(a=>{const k=a.title.toLowerCase().slice(0,60);if(seen.has(k))return false;seen.add(k);return true;});articles.sort(()=>Math.random()-.5);STATE.articles=articles;renderCards(articles);}
 function renderSkeletons(){document.getElementById('feed').innerHTML=Array.from({length:6}).map(()=>`<div class="card"><div class="card-header"><div class="skeleton short"></div><div class="skeleton" style="width:50px"></div></div><div class="card-body"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton short"></div><div class="skeleton tall" style="margin-top:10px"></div></div><div class="card-footer"><div class="skeleton" style="width:60px"></div><div class="skeleton" style="width:80px"></div></div></div>`).join('');}
-function renderCards(articles){const feed=document.getElementById('feed');const list=STATE.currentCat==='all'?articles:articles.filter(a=>a.cat===STATE.currentCat);if(!list.length){feed.innerHTML=`<div class="state-box"><div class="icon">📡</div><div>No articles for this category.<br><small style="color:var(--faint)">Add feeds via Creator Settings (click logo 5×)</small></div></div>`;return;}feed.innerHTML=list.map((a,i)=>cardHTML(a,i)).join('');if(STATE.mode==='edge'&&getActiveKey())list.forEach((a,i)=>{if(!a.rewritten&&!a.rewriting)rewriteArticle(a,i,list);});}
+function renderCards(articles){const feed=document.getElementById('feed');const list=STATE.currentCat==='all'?articles:articles.filter(a=>a.cat===STATE.currentCat);if(!list.length){const isAll=STATE.currentCat==='all';feed.innerHTML=`<div class="state-box"><div class="icon">📡</div><div>${isAll?'Feeds timed out or are unavailable right now.':`No articles for "${CAT_LABELS[STATE.currentCat]||STATE.currentCat}".`}<br><small style="color:var(--faint)">${isAll?'':"Try 'All' or add more feeds via Creator Settings."}</small></div>${isAll?`<button onclick="loadAllFeeds()" style="margin-top:.8rem;padding:.5rem 1.4rem;border-radius:20px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;letter-spacing:.04em">↺ Retry</button>`:"" }</div>`;return;}feed.innerHTML=list.map((a,i)=>cardHTML(a,i)).join('');if(STATE.mode==='edge'&&getActiveKey())list.forEach((a,i)=>{if(!a.rewritten&&!a.rewriting)rewriteArticle(a,i,list);});}
 
 /* ============================================================
    CARD HTML — source link ALWAYS present in footer
